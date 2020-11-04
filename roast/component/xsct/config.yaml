@@ -1,0 +1,79 @@
+# Supported app configurations
+{ "APP_CONFIG": [
+                "assembler-flags",                # Miscellaneous flags for assembler
+                "build-config",                   # Get/set build configuration
+                "compiler-misc",                  # Compiler miscellaneous flags
+                "compiler-optimization",          # Optimization level
+                "define-compiler-symbols",        # Define symbols. Ex. MYSYMBOL
+                "include-path",                   # Include path for header files
+                "libraries",                      # Libraries to be added while linking
+                "library-search-path",            # Search path for the libraries added
+                "linker-misc",                    # Linker miscellaneous flags
+                "linker-script",                  # Linker script for linking
+                "undef-compiler-symbols",         # Undefine symbols. Ex. MYSYMBOL
+              ],
+
+# Supported bsp configurations
+"BSP_CONFIG": [
+                "archiver",                       # ex: aarch64-none-elf-ar"
+                "compiler",                       # ex: aarch64-none-elf-gcc
+                "compiler_flags",
+                "extra_compiler_flags",
+                "enable_sw_intrusive_profiling",
+                "microblaze_exceptions",
+                "predecode_fpu_exceptions",
+                "profile_timer",
+                "stdout",
+                "stdin",
+              ],
+
+# ENV params list
+"GLOBAL_PARAMS_LIST": [
+                        "BUILD_SOURCE",           # Ex. SDK
+                        "COMPONENT",              # Application to be build Ex. versal_plm
+                        "XSCT_CONFIG",            # Path of config.yaml file
+                        "DEFAULT_XSCT_CONFIG",    # Path of defconfig.yaml file
+                        "ESW_REPO",               # Regression Repo Path
+                        "PACKAGES_PATH",          # PACKAGES directory path
+                        "REGRESS_REPO",           # REGRESS_REPO path
+                        "SCRIPTS_PYTHON",         # Python scripts path
+                        "XSCT_PATH",              # XSCT path
+                        "APP_TCL",                # app.tcl path
+                    ],
+
+# Mandatory args
+"MANDATORY_ARGS": [
+                    "component",                  # compnent to be build
+                    "hdf",                        # hdf path of the component
+                    "processor",                  # processor name
+                    "ws",                         # work space path
+                ],
+
+# Supported tcl arguments
+"TCL_SUPPORTED_ARGS": [
+                        "app",                    # App to be build
+                        "arch",                   # Architecture to be used 32/64
+                        "bspname",                # bspname to be used
+                        "do_compile",             # do_compile, Def = 1
+                        "do_cleanup",             # do_cleanup, Def = 1
+                        "driver",                 # driver to be build
+                        "elf_name",               # elf name to be used
+                        "example_name",           # example name to be build
+                        "extension",              # path of the extension.tcl file
+                        "hdf",                    # path of hdf
+                        "hwpname",                # hw project name
+                        "lib",                    # list of libraries to be added
+                        "library_name",           # library name to be build
+                        "osname",                 # os to be used, Def = standalone
+                        "out_dir",                # path of the output elf dir
+                        "pname",                  # project name
+                        "processor",              # processor to be used
+                        "rp",                     # repository to be used
+                        "rp_intg",                # intg repository path
+                        "src",                    # src files to be copied
+                        "ws",                     # path of the workspace
+                        "yamlconf",               # yaml configuration
+                        "functest_name",          # function test name
+                        "build_till_bsp",         # build till bsp only
+                      ],
+}

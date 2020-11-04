@@ -1,0 +1,2 @@
+# ROAST
+ROAST, a unified framework for component testing across system topologies addresses the challenges of testing a complex heterogenous adaptive computer acceleration platform (ACAP) against a wide range of scenarios, finding edge cases that would not have been usually covered with traditional testing methods. ROAST includes a modular plugin architecture built on Python for extensibility and scalability in building components, launching tests, and collecting results.

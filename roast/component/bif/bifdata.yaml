@@ -1,0 +1,9 @@
+{
+    'plm':['bootloader','${DEPLOY_APP_DESIGN_DIR}/plm.elf'],
+    'pmccdo':['pmcdata,load=0xF2000000','${DEPLOY_APP_DESIGN_DIR}/pmc_data.cdo'],
+    'cdo':['partition_type=cdo','path'],
+    'aie-elf':['destination_cpu=aie', 'path'],
+    'psm':['destination_cpu=psm', '/proj/xbuilds/HEAD_INT_daily_latest/installs/lin64/Vivado/2019.2/data/embeddedsw/lib/sw_apps/versal_psmfw/psm_fw.elf'],
+    'a72':['destination_cpu=a72-0', '${DEPLOY_APP_DIR}/${APP_NAME}_${PROC_NAME}.elf'],
+    'r5':['destination_cpu=r5-0', '${DEPLOY_APP_DIR}/${APP_NAME}_${PROC_NAME}.elf']
+}

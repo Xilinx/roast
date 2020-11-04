@@ -1,0 +1,6 @@
+{
+    'plm':['versal PLM', 'psv_pmc_0'],
+    'psm':['versal PSM Firmware', 'psv_psm_0'],
+    'makertaker_a72':['makertaker', 'psv_cortexa72_0'],
+    'makertaker_r5':['makertaker', 'psv_cortexr5_0']
+}

@@ -1,0 +1,244 @@
+# This file contains the build configuration for various applications that can be build using xsct
+
+########################
+# ARGUMENT DESCRIPTION #
+########################
+
+# app           - Application Name to be build [Ex. "versal PLM"]
+# arch          - Platform Architecture ["32","64"]
+# do_compile    - Build Project ["0","1"]
+# hwpname       - Hardware Project Name
+# osname        - Target OS ["standlaone"]
+# pname         - Project Name
+
+{
+    "common":
+            {
+                "arch"              : "64",
+                "do_compile"        : "1",
+                "hwpname"           : "hw0",
+                "osname"            : "standalone",
+            },
+    "makertaker_a72":
+            {   
+                "app"               : "makertaker",
+                "pname"             : "makertaker",
+
+            },
+
+    "ddr_self_refresh":
+            {
+                "app"               : "DDR self refresh",
+                "pname"             : "ddr_self_refresh",
+            },
+
+    "dhrystone":
+            {
+                "app"               : "Dhrystone",
+                "pname"             : "dhrystone",
+            },
+
+    "empty_application":
+            {
+                "app"               : "Empty Application",
+                "pname"             : "empty_application",
+            },
+
+    "freertos_hello_world":
+            {
+                "app"               : "FreeRTOS Hello World",
+                "pname"             : "freertos_hello_world",
+            },
+
+    "freertos_lwip_echo_server":
+            {
+                "app"               : "FreeRTOS lwIP Echo Server",
+                "pname"             : "freertos_lwip_echo_server",
+            },
+
+    "freertos_lwip_tcp_perf_client":
+            {
+                "app"               : "FreeRTOS lwIP TCP Perf Client",
+                "pname"             : "freertos_lwip_tcp_perf_client",
+            },
+
+    "freertos_lwip_tcp_perf_server":
+            {
+                "app"               : "FreeRTOS lwIP TCP Perf Server",
+                "pname"             : "freertos_lwip_tcp_perf_server",
+            },
+
+    "freertos_lwip_udp_perf_client":
+            {
+                "app"               : "FreeRTOS lwIP UDP Perf Client",
+                "pname"             : "freertos_lwip_udp_perf_client",
+            },
+
+    "freertos_lwip_udp_perf_server":
+            {
+                "app"               : "FreeRTOS lwIP UDP Perf Server",
+                "pname"             : "freertos_lwip_udp_perf_server",
+            },
+
+    "freertos_libmetal_echo_demo":
+            {
+                "app"               : "Libmetal AMP Demo",
+                "pname"             : "freertos_libmetal_echo_demo",
+            },
+
+    "freertos_openamp_echo_test":
+            {
+                "app"               : "OpenAMP echo-test",
+                "pname"             : "freertos_openamp_echo_test",
+            },
+
+    "freertos_openamp_mat_mul_demo":
+            {
+                "app"               : "OpenAMP matrix multiplication Demo",
+                "pname"             : "freertos_openamp_mat_mul_demo",
+            },
+
+    "freertos_openamp_rpc_demo":
+            {
+                "app"               : "OpenAMP RPC Demo",
+                "pname"             : "freertos_openamp_rpc_demo",
+            },
+
+    "hello_world":
+            {
+                "app"               : "Hello World",
+                "pname"             : "hello_world",
+            },
+
+    "libmetal_echo_demo":
+            {
+                "app"               : "Libmetal AMP Demo",
+                "pname"             : "libmetal_echo_demo",
+            },
+
+    "lwip_echo_server":
+            {
+                "app"               : "lwIP Echo Server",
+                "pname"             : "lwip_echo_server",
+            },
+
+    "lwip_tcp_perf_client":
+            {
+                "app"               : "lwIP TCP Perf Client",
+                "pname"             : "lwip_tcp_perf_client",
+            },
+
+    "lwip_tcp_perf_server":
+            {
+                "app"               : "lwIP TCP Perf Server",
+                "pname"             : "lwip_tcp_perf_server",
+            },
+
+    "lwip_udp_perf_client":
+            {
+                "app"               : "lwIP UDP Perf Client",
+                "pname"             : "lwip_udp_perf_client",
+            },
+
+    "lwip_udp_perf_server":
+            {
+                "app"               : "lwIP UDP Perf Server",
+                "pname"             : "lwip_udp_perf_server",
+            },
+
+    "memory_tests":
+            {
+                "app"               : "Memory Tests",
+                "pname"             : "memory_tests",
+            },
+
+    "openamp_echo_test":
+            {
+                "app"               : "OpenAMP echo-test",
+                "pname"             : "openamp_echo_test",
+            },
+
+    "openamp_mat_mul_demo":
+            {
+                "app"               : "OpenAMP matrix multiplication Demo",
+                "pname"             : "openamp_matrix_multiply",
+            },
+
+    "openamp_rpc_demo":
+            {
+                "app"               : "OpenAMP RPC Demo",
+                "pname"             : "openamp_rpc_demo",
+            },
+
+    "peripheral_tests":
+            {
+                "app"               : "Peripheral Tests",
+                "pname"             : "peripheral_tests",
+            },
+
+    "rsa_auth_app":
+            {
+                "app"               : "RSA Authentication App",
+                "pname"             : "rsa_auth_app",
+            },
+
+    "srec_bootloader":
+            {
+                "app"               : "SREC Bootloader",
+                "pname"             : "srec_bootloader",
+            },
+
+    "srec_spi_bootloader":
+            {
+                "app"               : "SREC SPI Bootloader",
+                "pname"             : "srec_spi_bootloader",
+            },
+
+    "versal_plm":
+            {
+                "app"               : "versal PLM",
+                "pname"             : "versal_plm",
+            },
+
+    "versal_pmcfw":
+            {
+                "app"               : "versal PMC Firmware",
+                "pname"             : "versal_pmcfw",
+            },
+
+    "versal_psmfw":
+            {
+                "app"               : "versal PSM Firmware",
+                "pname"             : "versal_psmfw",
+            },
+
+    "zynq_dram_tests":
+            {
+                "app"               : "Zynq DRAM tests",
+                "pname"             : "zynq_dram_test",
+            },
+
+    "zynq_fsbl":
+            {
+                "app"               : "Zynq FSBL",
+                "pname"             : "zynq_fsbl",
+            },
+
+    "zynqmp_dram_test":
+            {
+                "app"               : "Zynq MP DRAM tests",
+                "pname"             : "zynqmp_dram_test",
+            },
+
+    "zynqmp_fsbl":
+            {
+                "app"               : "Zynq MP FSBL",
+                "pname"             : "zynqmp_fsbl",
+            },
+
+    "zynqmp_pmufw":
+        {
+            "app"                   : "ZynqMP PMU Firmware",
+            "pname"                 : "zynqmp_pmufw",
+        },
+}
