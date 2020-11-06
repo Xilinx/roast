@@ -59,7 +59,7 @@ class FileOps:
         self.console.runcmd(cmd)
 
     def device_erase(self, device, bs="1024", count="1"):
-        partitions = self.get_partition_list(device)
+        partitions = self.get_partition_list([device])
         self.unmount(partitions)
         cmd = f"dd if=/dev/zero of={device} bs={bs} count={count}"
         self.console.runcmd(cmd)
@@ -120,8 +120,11 @@ class FileOps:
         device_partitions_dict = {}
         for device in device_list:
             partitions_list = []
+            output_list = []
             self.console.runcmd(f"ls {device}* | awk '{{print $NF}}'", expected="\r\n")
-            partitions_list = self.console.output().split("\r\n")
+            output_list = self.console.output().split("\r\n")
+            for element in output_list:
+                partitions_list.append(element.strip())
             partitions_list.remove(device)
             device_partitions_dict.update({device: partitions_list})
         if not device_partitions_dict:

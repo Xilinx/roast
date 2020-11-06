@@ -25,7 +25,7 @@ packages.extend(
 
 setup(
     name="roast",
-    version="1.0.0",
+    version="1.0.1",
     description="Randomized Okaying Across System Topologies (ROAST) Python Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
