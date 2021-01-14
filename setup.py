@@ -25,7 +25,7 @@ packages.extend(
 
 setup(
     name="roast",
-    version="1.0.1",
+    version="2.0.0",
     description="Randomized Okaying Across System Topologies (ROAST) Python Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -38,6 +38,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
     ],
     keywords="roast",
@@ -47,30 +48,15 @@ setup(
     python_requires=">=3.6, <4",
     install_requires=[
         "python-configuration[yaml,toml]>=0.8",
-        "stevedore==1.32.0",
+        "stevedore>=3.0",
         "gitpython",
         "pexpect",
-        "yamlordereddictloader",
+        "pyyaml",
         "mimesis",
         "filelock",
         "python-box",
     ],
     extras_require={
         "dev": ["pytest", "pytest-mock", "pytest-black", "pytest-freezegun"]
-    },
-    entry_points={
-        "roast.component.system": [
-            "hwflow = roast.component.hwflow:HwbuildRunner",
-        ],
-        "roast.board": [
-            "host_target = roast.component.board.board:TargetBoard",
-            "network_target = roast.component.board.board:TargetBoard",
-        ],
-        "roast.serial": [
-            "host = roast.serial:HostSerial",
-        ],
-        "roast.relay": [
-            "usb = roast.component.board.relay:UsbRelay",
-        ],
     },
 )

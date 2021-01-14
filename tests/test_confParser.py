@@ -6,7 +6,6 @@
 import os
 import inspect
 import pytest
-import roast
 from roast.confParser import generate_conf, get_machine_file
 
 
@@ -64,12 +63,6 @@ def test_generate_conf_machine(request, mocker):
     mocker.patch("roast.confParser.get_machine_file", return_value=machine_file)
     config = generate_conf(rootdir, fspath, test_name, machine="zynq")
     assert config["dtb_arch"] == "arm"
-
-
-def test_get_machine_file():
-    import roast.machines.zynq
-
-    assert get_machine_file("zynq") == inspect.getsourcefile(roast.machines.zynq)
 
 
 def test_get_machine_file_exception(request):

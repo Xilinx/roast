@@ -16,7 +16,6 @@ import string
 from filelock import FileLock
 import itertools, collections.abc
 import yaml
-import yamlordereddictloader
 import subprocess
 import atexit
 from pathlib import Path
@@ -365,7 +364,7 @@ def is_defined(args, mandatory_args):
 
     # Test for the mandatory args
     for arg in mandatory_args:
-        if arg not in args.keys() or args[arg] is None or args[arg] is "":
+        if arg not in args.keys() or args[arg] is None or args[arg] == "":
             msg = surround_double_quotes(arg) + " " + "is not defined"
             print_err_exit(msg)
 
@@ -591,6 +590,27 @@ def mkdir(folderpath: str, silent_discard: bool = True) -> None:
             sys.exit(1)
 
 
+def mkfile(fname: str, silent_discard: bool = True) -> None:
+    """Open an empty file, raises Error Message on demand
+       Equivalent to touch in shell
+
+    Arguments:
+        filepath {string} -- Path of file
+    """
+    is_successful = False
+    try:
+        Path(fname).touch()
+        is_successful = True
+    except:
+        pass
+    if not silent_discard:
+        if is_successful:
+            print("%s Created File" % fname)
+        else:
+            print("%s Unable to create file " % fname)
+            sys.exit(1)
+
+
 def is_error(stderr_msg: str) -> bool:
     """Return True if the error string not found else exits with error message.
 
@@ -735,12 +755,16 @@ def check_output(cmd, env=None, silent_discard=False):
     return output, returncode
 
 
-def runcmd_p(cmd, log, env=None, cwd="./", expected_code=0):
+def runcmd_p(cmd, log, env=None, cwd="./", expected_code=0, return_code=False):
     """Sends command on to the console and raises assertion error if the
     command is not executed successfully.
 
     Args:
         cmd (str): Command to be executed.
+        log (logger): logger to record debug prints
+        cwd (str): PWD path to execute cmd
+        expected_code (int): Expected return code value from the function
+        return_code (boolean): True = returns cmd exit code, False = Asserts error
     Raises:
         Assertion error only when command execution fails
     """
@@ -764,7 +788,12 @@ def runcmd_p(cmd, log, env=None, cwd="./", expected_code=0):
     if retcode != expected_code:
         err_msg = f"{cmd} failed with return code {retcode}, expected {expected_code}"
         log.error(err_msg)
-        assert False, err_msg
+        if return_code:
+            return retcode
+        else:
+            assert False, err_msg
+    elif return_code:
+        return retcode
 
 
 # Function to add newline in file.

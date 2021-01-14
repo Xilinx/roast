@@ -5,7 +5,7 @@
 
 import os
 import pkg_resources
-from roast.component import scenario
+from roast.component.scenario import scenario
 from roast.component.system import SystemBase
 from roast.component.testsuite import TestSuiteBase
 from roast.confParser import generate_conf
@@ -43,11 +43,8 @@ class DummyTestSuite(TestSuiteBase):
 def test_component_interface(request):
     ts_name = "dummy_ts"
     sys_name = "dummy_sys"
-    location = __file__
-    register_plugin(
-        location, ts_name, "testsuite", "tests.test_component:DummyTestSuite"
-    )
-    register_plugin(location, sys_name, "system", "tests.test_component:DummySystem")
+    register_plugin(ts_name, "testsuite", "tests.test_component:DummyTestSuite")
+    register_plugin(sys_name, "system", "tests.test_component:DummySystem")
 
     rootdir = request.config.rootdir.strpath
     fspath = request.node.fspath

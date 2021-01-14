@@ -15,10 +15,9 @@ def test_setup_logger_default(tmpdir, mocker):
     teardown_logger()
     assert os.path.isfile(os.path.join(log_dirname, "20200801-123456.log"))
 
-    mock_formatter = mocker.patch("logging.Formatter")
-    datefmt = "%Y-%m-%d %H:%M:%S"
-    setup_logger(log_dirname, datefmt=datefmt)
-    mock_formatter.assert_called_with(datefmt=datefmt)
+    datefmt = "%Y-%m-%d %H:%M"
+    _logger = setup_logger(log_dirname, datefmt=datefmt)
+    assert _logger.handlers[1].formatter.datefmt == datefmt
 
 
 def test_setup_logger_dirname(tmpdir):
