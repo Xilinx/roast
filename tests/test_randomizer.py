@@ -4,7 +4,7 @@
 #
 
 import pytest
-from roast.providers import Randomizer
+from roast.providers.randomizer import Randomizer
 from tests.providers import MyProvider
 
 

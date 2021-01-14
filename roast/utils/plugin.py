@@ -3,17 +3,23 @@
 # SPDX-License-Identifier: MIT
 #
 
+try:
+    # For python 3.8 and later
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    # For everyone else
+    import importlib_metadata
+
 import logging
-import pkg_resources
+from stevedore import ExtensionManager
 
 log = logging.getLogger(__name__)
 
 
-def register_plugin(location, name, plugin_type, entry_point) -> None:
-    """Registers a plugin to the global working_set instance without needing to install.
+def register_plugin(name, plugin_type, entry_point) -> None:
+    """Registers a plugin dynamically without needing to install as a package.
 
     Args:
-        location (str): Full path to file that might be used on sys.path.
         name (str): Name of plugin to be referenced.
         plugin_type (str): Type to determine plugin namespace.
         entry_point (str): Entry point in the form: some.module:some.attr
@@ -21,8 +27,6 @@ def register_plugin(location, name, plugin_type, entry_point) -> None:
     Raises:
         Exception: Raised when plugin_type is not supported.
     """
-    distribution = pkg_resources.Distribution(location=location, project_name=name)
-    distribution._ep_map = {}
     if plugin_type == "system":
         namespace = "roast.component.system"
     elif plugin_type == "testsuite":
@@ -38,6 +42,13 @@ def register_plugin(location, name, plugin_type, entry_point) -> None:
         log.error(err_msg)
         raise Exception(err_msg)
 
-    ep = pkg_resources.EntryPoint.parse(f"{name} = {entry_point}", dist=distribution)
-    distribution._ep_map.update({namespace: {name: ep}})
-    pkg_resources.working_set.add(distribution)
+    ep = importlib_metadata.EntryPoint(name, entry_point, namespace)
+    e = ExtensionManager(namespace)
+    if namespace in e.ENTRY_POINT_CACHE:
+        entry_points = e.ENTRY_POINT_CACHE.get(namespace)
+        if name not in [entry_point.name for entry_point in entry_points]:
+            entry_points.append(ep)
+            e.ENTRY_POINT_CACHE[namespace] = entry_points
+    else:
+        e.ENTRY_POINT_CACHE[namespace] = [ep]
+    ep.load()

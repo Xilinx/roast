@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 #
 
-import time
 from abc import ABCMeta, abstractmethod
 from stevedore import driver
 from roast.utils import register_plugin
@@ -33,10 +32,9 @@ class Relay:
             relay_type = "dummy_relay"
             kwargs = {}
             register_plugin(
-                __file__,
                 "dummy_relay",
                 "relay",
-                "roast.component.board.relay:DummyRelay",
+                "roast.component.relay:DummyRelay",
             )
         self._relay_mgr = driver.DriverManager(
             namespace="roast.relay",
@@ -72,27 +70,3 @@ class DummyRelay(RelayBase):
     def reconnect(self, seconds: int = 5):
         self.reconnected = True
         self.seconds = seconds
-
-
-class UsbRelay(RelayBase):
-    def __init__(self, session):
-        self._session = session
-        self.expected_failures = "J283"
-        self.expected = session.host
-
-    def disconnect(self):
-        cmd = "sudo usb_relay off"
-        self._session.host_console.runcmd(
-            cmd, self.expected_failures, self.expected, wait_for_prompt=False
-        )
-
-    def connect(self):
-        cmd = "sudo usb_relay on"
-        self._session.host_console.runcmd(
-            cmd, self.expected_failures, self.expected, wait_for_prompt=False
-        )
-
-    def reconnect(self, seconds=5):
-        self.disconnect()
-        time.sleep(seconds)
-        self.connect()
