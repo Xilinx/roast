@@ -3,8 +3,14 @@
 # SPDX-License-Identifier: MIT
 #
 
+from box import Box
+
+a = Box(default_box=True)
+a.b = "2020.1"
+
+# This should not take effect as base parameters cannot be overriden in standard configuration.
+# If required, must use override mechanism.
 ROOT = ""
-buildDir = "{ROOT}/build"
 
 # hwflow
 version = "2020.2"
@@ -20,4 +26,13 @@ lsf_mem = "65536"
 # dtg
 dtb_arch = "aarch64"
 
+# override tests
 mylist = ["a", "b"]
+b = Box(default_box=True)
+b.a = "hello"
+b.b = "hello again"
+
+# missing variable
+missingvar = "{novar} test"
+
+del Box

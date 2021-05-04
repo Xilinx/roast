@@ -6,6 +6,8 @@
 import os
 import sys
 import git
+import glob
+import logging
 import fileinput
 import shutil
 import inspect
@@ -24,19 +26,29 @@ from distutils.dir_util import copy_tree
 from typing import Any, List, Optional, Dict
 from warnings import warn
 
+log = logging.getLogger(__name__)
+
 
 class Git:
-    def __init__(self, git_params, repo_path, clone_once, logfile):
+    def __init__(self, git_params, repo_path, clone_once):
         self.repo = None
         self.repo_url = git_params.url
         self.branch = git_params.branch
-        self.sparse_path = git_params.sparse_path
-        self.patches = git_params.patches
-        self.patchesDir = git_params.patchesDir
-        self.rev = git_params.rev
+        self.sparse_path = git_params.get("sparse_path", [])
+        self.patches = git_params.get("patches", [])
+        self.patchesDir = git_params.get("patchesDir")
+        self.rev = git_params.get("rev")
         self.repo_path = repo_path
-        self.logfile = logfile
         self.clone_once = clone_once
+        log.info("******************************************************")
+        log.info(f"repo_url : {self.repo_url}")
+        log.info(f"branch : {self.branch}")
+        log.info(f"sparse_path : {self.sparse_path}")
+        log.info(f"patches : {self.patches}")
+        log.info(f"patchesDir : {self.patchesDir}")
+        log.info(f"rev : {self.rev}")
+        log.info(f"repo_path : {self.repo_path}")
+        log.info("******************************************************")
 
     def clone(self, **kwargs):
         self.repo_name = get_base_name(self.repo_path)
@@ -52,6 +64,7 @@ class Git:
 
     def _clone(self, **kwargs):
 
+        log.info(f"Cloning {self.repo_url}")
         no_checkout = True if len(self.sparse_path) else False
         git.Repo.clone_from(
             self.repo_url,
@@ -70,10 +83,6 @@ class Git:
                 fd.writelines(self.sparse_path)
             self.repo.git.checkout(self.branch)
 
-        self.last_hash = self.repo.git.rev_parse(["--verify", "HEAD"])
-        self.origin_commit = self.repo.git.log(
-            "-n 1", "--pretty=format:%H - %an, %ar : %s"
-        )
         if kwargs.get("recurse_submodules") == "latest":
             for submodule in self.repo.submodules:
                 submodule.update(init=True)
@@ -83,7 +92,6 @@ class Git:
     def checkout(self):
         if self.rev:
             self.repo.git.checkout(self.rev)
-            self.last_hash = self.repo.git.rev_parse(["--verify", "HEAD"])
 
     def apply_patch(self, workDir):
 
@@ -106,13 +114,12 @@ class Git:
     def clean(self):
         self.repo.git.clean("-xdf")
 
-    def run_gitcmd(self, cmd, logger=None, ret_out=False):
+    def run_gitcmd(self, cmd, ret_out=False):
         """Run the git command specified by the cmd input, in the specified repo
         path.
 
         Args:
             cmd (str): the git command to be executed
-            logger (logging.getLogger, optional): logger object
             ret_out (bool, optional): decides if the output of git commands need
                      to be returned for further processing. Defaults to False.
 
@@ -123,15 +130,11 @@ class Git:
         g = git.cmd.Git(os.path.realpath(self.repo_path))
         cmd_list = cmd.split()
         stat, out, err = g.execute(cmd_list, with_extended_output=True)
-        if logger is not None:
-            logger.debug(out)
         if ret_out:
             return stat, out, err
         return stat
 
-    def git_update_repo(
-        self, branch=None, commit=None, tag=None, logger=None, ret_out=False
-    ):
+    def git_update_repo(self, branch=None, commit=None, tag=None, ret_out=False):
         """Updates the user provided repo to user specified tag or branch
             or (branch and optional commit ID)
             Note: if no tag, branch, commit is provided it updates the repo to
@@ -142,7 +145,6 @@ class Git:
             commit (str, optional): commit sha to check out, to be used with
                     valid branch. Defaults to None.
             tag (str, optional): tag that needs to be checked out. Defaults to None.
-            logger (logging.getLogger, optional): logger object. Defaults to None.
             ret_out (bool, optional): boolean that decides if deatiled output of
                     updating need to be returned. Defaults to False.
 
@@ -165,12 +167,12 @@ class Git:
         repo = git.Repo(gp)
         git_commit = repo.git.rev_parse(repo.head.commit.hexsha, short=7)
         try:
-            git_branch = str(repo.active_branch)
+            git_branch = repo.active_branch.name
         except TypeError:
             git_branch = None
         try:
             _, git_tag, _ = self.run_gitcmd(
-                f"git describe --exact-match {git_commit}", None, True
+                f"git describe --exact-match {git_commit}", True
             )
         except git.exc.GitCommandError:
             git_tag = None
@@ -179,19 +181,17 @@ class Git:
         # Check if the repo is already in requested state
         if tag:
             if git_tag == tag:
-                if logger is not None:
-                    out += f"Not updating, repo already at required tag : {tag}"
-                    logger.debug(out)
+                out += f"Not updating, repo already at required tag : {tag}"
+                log.debug(out)
                 if ret_out:
                     return True, out
                 else:
                     return
         if branch and commit:
             short_sha = repo.git.rev_parse(commit, short=7)
-            if (git_branch == branch) and (git_commit == short_sha):
-                if logger is not None:
-                    out += f"Not updating, repo already at branch {git_branch}, {git_commit}"
-                    logger.debug(out)
+            if git_commit == short_sha:
+                out += f"Not updating, repo already at commit: {git_commit}"
+                log.debug(out)
                 if ret_out:
                     return True, out
                 else:
@@ -205,7 +205,7 @@ class Git:
         elif branch:
             status = status or self.run_gitcmd(f"git checkout {branch}")
             status = status or self.run_gitcmd(f"git pull origin {branch}")
-            out += f"updated branch: {repo.active_branch}"
+            out += f"updated branch: {repo.active_branch.name}"
             if commit:
                 status = status or self.run_gitcmd(f"git checkout {commit}")
                 out += f" checked out commit {commit}"
@@ -214,35 +214,77 @@ class Git:
             status = status or self.run_gitcmd("git pull origin master")
             commit = repo.git.rev_parse(repo.head.commit.hexsha, short=7)
             out += f"updated to master branch, commit {commit}"
-        if logger is not None:
-            logger.debug(out)
+        log.debug(out)
         if ret_out:
             return not status, out
         return not status
 
     def log(self):
-        if self.logfile is None:
-            return
-        # repo_url = self.repo.git.remote("get-url", "origin")
-        # FIXME due to git version not supporting the command (Required git version 2.23.0)
-        repo_url = self.repo.git.config("--get", "remote.origin.url")
-        repo_branch = self.repo.git.branch()
+        # print log for a valid git repo
+        if is_git_repo(self.repo_path):
+            self.repo = git.Repo(self.repo_path)
+            # repo_url = self.repo.git.remote("get-url", "origin")
+            # FIXME due to git version not supporting the command (Required git version 2.23.0)
+            repo_url = self.repo.git.config("--get", "remote.origin.url")
+            remote = self.repo.git.remote()
+            repo_current_branch = self.repo.git.rev_parse(["--abbrev-ref", "HEAD"])
+            self.local_commits = ""
+            self.origin_commit = ""
+            if repo_current_branch != "HEAD":
+                repo_branch_str = self.repo.git.log(
+                    "--pretty=format:%d",
+                )
+                # Get all the remote branches
+                remote_branches = [
+                    branch
+                    for branch in list(filter(None, repo_branch_str.split("\n")))
+                    if remote in branch
+                ]
+                # Get the latest remote branch
+                remote_branches = remote_branches[0].split(",")
+                for branch in remote_branches:
+                    branch = re.sub("[() ]", "", branch)
+                    if remote in branch and "HEAD" not in branch:
+                        remote_branch = branch
+                self.local_commits = self.repo.git.log(
+                    f"{remote_branch}...{repo_current_branch}",
+                    '--pretty=format:"%H - %an, %ar : %s"',
+                )
+                self.origin_commit = self.repo.git.log(
+                    f"{remote_branch}",
+                    "-n 1",
+                    '--pretty=format:"%H - %an, %ar : %s"',
+                )
+            else:
+                repo_current_branch = self.repo.git.branch()
+                match_obj = re.search(
+                    "HEAD detached (at|from) ([a-z0-9]+)", repo_current_branch
+                )
+                if match_obj:
+                    repo_branch_commit = match_obj.group(2)
+                    repo_head_commit = self.repo.git.rev_parse(["--verify", "HEAD"])
+                    self.local_commits = self.repo.git.log(
+                        f"{repo_branch_commit}...{repo_head_commit}",
+                        '--pretty=format:"%H - %an, %ar : %s"',
+                    )
+                    self.origin_commit = self.repo.git.log(
+                        "-n 1",
+                        repo_branch_commit,
+                        '--pretty=format:"%H - %an, %ar : %s"',
+                    )
+                if not self.origin_commit:
+                    remote = "HEAD"
+                    self.origin_commit = self.repo.git.log(
+                        "-n 1", "--pretty=format:%H - %an, %ar : %s"
+                    )
 
-        with open(self.logfile, "w") as f:
-            f.write("\n******************************************************\n")
-            f.write(f" REPO URL: {repo_url}\n")
-            f.write(f" BRANCH: {repo_branch}\n")
-            f.write(f" ORIGIN_COMMIT: {self.origin_commit}\n")
-
-            commit_diff = self.repo.git.log(
-                f"{self.last_hash}..HEAD", "--pretty=format:%H - %an, %ar : %s"
-            )
-            if commit_diff:
-                commit_diff = commit_diff.split("\n")
-                f.write(" COMMIT DIFF:\n")
-                for line in commit_diff:
-                    f.write(f"\t{line}\n")
-            f.write("\n******************************************************\n")
+            log.info("******************************************************")
+            log.info(f" REPO URL: {repo_url}")
+            log.info(f" BRANCH: {repo_current_branch}")
+            if self.local_commits:
+                log.info(f" LOCAL_COMMITS: {self.local_commits}")
+            log.info(f" {remote.upper()} COMMIT: {self.origin_commit}")
+            log.info("******************************************************")
 
 
 def is_git_repo(repo_path):
@@ -262,9 +304,9 @@ def is_git_repo(repo_path):
         return False
 
 
-def clone(git_params, repo_path, logfile, workDir=None, clone_once=False, **kwargs):
+def clone(git_params, repo_path, workDir=None, clone_once=False, **kwargs):
 
-    git = Git(git_params, repo_path, clone_once, logfile)
+    git = Git(git_params, repo_path, clone_once)
 
     git.clone(**kwargs)
 
@@ -274,7 +316,7 @@ def clone(git_params, repo_path, logfile, workDir=None, clone_once=False, **kwar
 
         git.apply_patch(workDir)
 
-        git.log()
+    git.log()
 
 
 def surround_double_quotes(string: str) -> str:
@@ -636,6 +678,24 @@ def copy_file(src: str, dest, follow_symlinks=False):
     shutil.copy2(src, dest, follow_symlinks=follow_symlinks)
 
 
+def copy_match_files(src, dest, regex, follow_src_dir=False, follow_symlinks=False):
+    """This api finds files matching the regular expression,
+    and copies into the destination directory"""
+    mkdir(dest)
+    # Find all files with match patern
+    files = find_files(regex, src)
+    # check for is_file
+    for f in files:
+        if follow_src_dir:
+            relpath = os.path.relpath(f, src)
+            dirname = os.path.dirname(relpath)
+            dest_dir = os.path.join(dest, dirname)
+            mkdir(dest_dir)
+            shutil.copy2(f, dest_dir, follow_symlinks=follow_symlinks)
+        else:
+            shutil.copy2(f, dest, follow_symlinks=follow_symlinks)
+
+
 def cp_all_files(
     src: str, dest: str, symlinks: bool = False, ignore: bool = None
 ) -> None:
@@ -750,7 +810,7 @@ def check_output(cmd, env=None, silent_discard=False):
             raise Exception(err_msg) from None
         else:
             print(err_msg)
-        output = None
+        output = e.output
         returncode = e.returncode
     return output, returncode
 
@@ -781,6 +841,7 @@ def runcmd_p(cmd, log, env=None, cwd="./", expected_code=0, return_code=False):
         encoding="utf-8",
         shell=True,
         bufsize=1,
+        executable="/bin/bash",
     ) as p:
         for line in p.stdout:  # b'\n'-separated lines
             log.debug(line)
@@ -888,6 +949,12 @@ def has_key(dict_name, key) -> bool:
        dict_name: Dictionary name
        key: Key name
     """
+
+    warn(
+        "has_key is deprecated; use membership test operation `in` instead.",
+        DeprecationWarning,
+    )
+
     if isinstance(key, str) and "." in key:
         key = key.split(".")
     else:
@@ -925,7 +992,7 @@ def get_var(config, key: str, raise_except: bool = False) -> Any:
 
     warn(
         "get_var is deprecated; use dictionary .get() method instead.",
-        category=DeprecationWarning,
+        DeprecationWarning,
     )
 
     if not has_key(config, key):
@@ -1107,8 +1174,13 @@ def get_original_path(fpath):
 
 
 def overrides(conf, var):
-    """ This api overrides the dictionary which contains same key's """
-    if has_key(conf, var):
+    """This api overrides the dictionary which contains same keys"""
+    if isinstance(var, list):
+        for item in var:
+            if item in conf:
+                for key, value in conf[item].items():
+                    conf[key] = value
+    elif var in conf:
         for key, value in conf[var].items():
             conf[key] = value
     return conf
@@ -1119,6 +1191,13 @@ def find_file(search_file: str, search_path: str):
     absolute path of file, if file exists"""
     for File in Path(search_path).glob(f"**/{search_file}"):
         return File
+
+
+def find_files(search_pattern, search_path):
+    """This api find the files matching regex directories and returns
+    absolute path of files, if file exists"""
+
+    return glob.glob(f"{search_path}/{search_pattern}")
 
 
 def get_test_params(mydict, keys=[]):
@@ -1145,12 +1224,14 @@ def get_test_params(mydict, keys=[]):
     return lists
 
 
-def check_if_string_in_file(file_name: str, string_to_search: str) -> bool:
-    """ Check if any line in the file contains given string """
+def check_if_string_in_file(
+    file_name: str, string_to_search: str, search_flag: int = 0
+) -> bool:
+    """Check if any line in the file contains given string"""
     with open(file_name, "r") as read_obj:
-        for line in read_obj:
-            if re.search(string_to_search, line):
-                return True
+        file_data = read_obj.read()
+        if re.search(string_to_search, file_data, flags=search_flag):
+            return True
     return False
 
 
@@ -1281,18 +1362,39 @@ def get_config_data(config, key, temp=None):
         return parse_config(config, temp_dict[first])
 
 
+def is_filesystem_nfs(dir_path):
+    cmd = f"df -P -T {dir_path} | tail -n +2 | awk '{{print $2}}'"
+    filesystem, returncode = check_output(cmd)
+    if filesystem.strip() == "nfs":
+        return True
+    else:
+        return False
+
+
 def parse_config(config, value):
-    """ Parse config for string interpolation"""
+    """Parse config for string interpolation"""
 
     config["tmp_value"] = value
     return config["tmp_value"]
 
 
 def colorstr_to_plainstr(string):
-    """ Conversion from colour string to plain string if any"""
+    """Conversion from colour string to plain string if any"""
     ansi_escape = re.compile(r"\x1b(\[.*?[@-~]|\].*?(\x07|\x1b\\))")
     format_string = ansi_escape.sub("", str(string))
     return format_string
+
+
+def rsync(console, src, dest, exclude_list=[".git*"]):
+    cmd = f"rsync -aqv {src} {dest}"
+
+    if len(exclude_list) > 1:
+        exclude = ",".join(exclude_list)
+        cmd += f" --exclude={{{exclude}}}"
+    elif len(exclude_list) == 1:
+        exclude = "".join(exclude_list)
+        cmd += f"  --exclude={exclude}"
+    console.runcmd(cmd)
 
 
 class FileAdapter:

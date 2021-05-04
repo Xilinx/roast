@@ -17,6 +17,24 @@ def read(*parts):
         return fp.read()
 
 
+def get_version_and_cmdclass(package_path):
+    """Load version.py module without importing the whole package.
+
+    Template code from miniver
+    """
+    import os
+    from importlib.util import module_from_spec, spec_from_file_location
+
+    spec = spec_from_file_location(
+        "version", os.path.join(package_path, "roast", "_version.py")
+    )
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.__version__, module.cmdclass
+
+
+version, cmdclass = get_version_and_cmdclass(".")
+
 long_description = read("README.md")
 packages = find_packages(exclude=["contrib", "docs", "tests"])
 packages.extend(
@@ -25,7 +43,7 @@ packages.extend(
 
 setup(
     name="roast",
-    version="2.0.0",
+    version=version,
     description="Randomized Okaying Across System Topologies (ROAST) Python Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -47,7 +65,7 @@ setup(
     package_data={"": ["*.yaml", "*.tcl"]},
     python_requires=">=3.6, <4",
     install_requires=[
-        "python-configuration[yaml,toml]>=0.8",
+        "python-configuration[yaml,toml]==0.8.2",
         "stevedore>=3.0",
         "gitpython",
         "pexpect",
@@ -57,6 +75,7 @@ setup(
         "python-box",
     ],
     extras_require={
-        "dev": ["pytest", "pytest-mock", "pytest-black", "pytest-freezegun"]
+        "dev": ["pytest", "pytest-mock", "pytest-black", "pytest-freezegun", "miniver"]
     },
+    cmdclass=cmdclass,
 )

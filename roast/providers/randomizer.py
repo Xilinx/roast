@@ -25,21 +25,7 @@ class Randomizer(BaseDataProvider):
     class Meta:
         """Class for metadata."""
 
-        name = "generic"
-
-    def __getattr__(self, attrname: str) -> Any:
-        """Get attribute without underscore.
-
-        :param attrname: Attribute name.
-        :return: An attribute.
-        """
-        attribute = object.__getattribute__(self, "_" + attrname)
-        if attribute and callable(attribute):
-            self.__dict__[attrname] = attribute(
-                self.locale,
-                self.seed,
-            )
-            return self.__dict__[attrname]
+        name = "randomizer"
 
     def __dir__(self) -> List[str]:
         """Available data providers.

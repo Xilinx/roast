@@ -12,7 +12,7 @@ from roast.utils import register_plugin
 @pytest.fixture
 def b():
     name = "dummy_board"
-    register_plugin(name, "board", "tests.test_plugin:DummyBoard")
+    register_plugin(name, "board", "test_plugin:DummyBoard")
     return Board(board_type=name)
 
 
