@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: MIT
 #
 
-dtb_arch = "arm"
+zynq = {"dtb_arch": "arm"}

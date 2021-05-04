@@ -1,89 +1,11 @@
-.. _hello-world:
+.. _complex-repository-structures:
 
-=============
- Hello World
-=============
+===============================
+ Complex Repository Structures
+===============================
 
-The objective of this tutorial is to build a test repository starting with a a basic test and
-expanding to more complex parameterized and categoried tests leveraging ROAST to generate its
-configuration.
-
-.. contents::
-  :local:
-
-Environment Setup
-=================
-
-While ROAST is test runner agnostic, this tutorial will use `pytest`_ and
-:ref:`pytest fixtures<pytest-fixtures>` developed specifically for ROAST. This means both ``roast``
-and ``pytest-roast`` packages must be installed. While optional, it is highly recommended that
-these are installed into a `virtual environment`_.
-
-Upon installation of ``pytest-roast``, ``pytest`` will automatically be installed as a dependency.
-
-.. note::
-   Please review :ref:`installation` instructions on how to install Python packages using pip.
-
-Repository Structure
-====================
-
-Tests can be structured in a number of ways. In this tutorial, we'll first start with a basic
-structure and then expand to parameterized and categorized tests.
-
-Basic
------
-
-Create a repository with the following structure and files::
-
-   basic/
-   └── tests/
-       ├── test_basic.py
-       └── conf.py
-
-conf.py
-
-.. code-block:: python
-
-    var = "hello world"
-
-test_basic.py
-
-.. code-block:: python
-
-    import pytest
-
-    def test_basic(create_configuration):
-        conf = create_configuration()
-        assert conf.var == "hello world"
-
-In **test_basic.py**, we can see that the ``create_configuration`` fixture is called which reads
-from **conf.py** and assigns it to the ``conf`` variable. The value of ``var`` is then accessed
-by accessing ``conf.var``.
-
-.. note::
-   For other methods of accessing configuration values, visit :ref:`configuration-system`.
-
-First, let's see what pytest collects as tests::
-
-    $ pytest --collect-only
-    ======= test session starts ========
-    ..
-    collected 1 item
-    <Module tests/test_basic.py>
-      <Function test_basic>
-
-    ====== no tests ran in 0.04s =======
-
-We can now execute the test::
-
-    $ pytest
-    ====== test session starts =======
-    ..
-    collected 1 item
-
-    tests/test_basic.py .       [100%]
-
-    ======= 1 passed in 0.18s ========
+In this tutorial, we're going to greatly expand the repository to accomodate for test variations
+and expand to complex parameterized and categoried tests.
 
 Parameterized
 -------------
@@ -168,9 +90,6 @@ For the second iteration, ``properties.parameter`` has a value of ``"parameter2"
 parameter has a value of ``["parameter2"]`` and the configuration files from directories **tests**
 and **test/parameter2** will be used. The ``properties.expected`` value that is compared with
 ``config.var`` is ``"hello parameter2"``.
-
-.. note::
-   For more details on test parameterization, visit `pytest parameterization`_.
 
 Let's see what pytest collects as tests::
 
@@ -333,7 +252,3 @@ Let's now execute the tests::
     category/test_something_else.py .. [100%]
 
     =========== 4 passed in 0.21s ===========
-
-.. _pytest: https://pytest.org/
-.. _virtual environment: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
-.. _pytest parameterization: https://docs.pytest.org/en/stable/parametrize.html

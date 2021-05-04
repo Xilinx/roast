@@ -21,6 +21,13 @@ class DummySerial(SerialBase):
     def __init__(self, config):
         super().__init__(config)
 
+    def _configure(self):
+        self.hostname = "hostname"
+        self.configure = True
+
+    def _connect(self):
+        self.connect = True
+
     def exit(self):
         self.exit = True
 
@@ -47,7 +54,7 @@ class DummyBoard(BoardBase):
 def test_register_plugin():
     namespace = "roast.serial"
     name = "dummy_serial"
-    register_plugin(name, "serial", "tests.test_plugin:DummySerial")
+    register_plugin(name, "serial", "test_plugin:DummySerial")
     e = ExtensionManager(namespace)
     serial_entries = [
         entry_point.name for entry_point in e.ENTRY_POINT_CACHE.get(namespace)
@@ -56,7 +63,7 @@ def test_register_plugin():
 
     namespace = "roast.board"
     name = "dummy_board"
-    register_plugin(name, "board", "tests.test_plugin:DummyBoard")
+    register_plugin(name, "board", "test_plugin:DummyBoard")
     e = ExtensionManager(namespace)
     board_entries = [
         entry_point.name for entry_point in e.ENTRY_POINT_CACHE.get(namespace)

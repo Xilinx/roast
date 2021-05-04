@@ -1,0 +1,8 @@
+filelock==3.0.12
+GitPython==3.1.11
+mimesis==4.1.2
+pexpect==4.8.0
+python-box==5.2.0
+python-configuration[yaml,toml]==0.8.2
+PyYAML==5.3.1
+stevedore==3.2.2

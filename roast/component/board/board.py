@@ -56,9 +56,7 @@ class BoardBase(metaclass=ABCMeta):
         if not self.target_ip:
             self.serial.sendline("ifconfig eth0")
             self.serial.expect("# ")
-            self.target_ip = self.serial.search(
-                "inet addr:([0-9]+.[0-9]+.[0-9]+.[0-9]+)"
-            )
+            self.target_ip = self.serial.search("(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
 
 
 class Board:

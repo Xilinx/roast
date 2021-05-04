@@ -47,13 +47,3 @@ class TestCollect:
 
     def get_test_params(self, test_name):
         return self.tests[test_name]  # returns dictinary with key value pairs
-
-
-def get_cmdl_machine_opt():
-    import pytest
-
-    machine = pytest.machine
-    if machine:
-        return machine[0].split(",")
-    else:
-        return None

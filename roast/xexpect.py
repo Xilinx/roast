@@ -76,13 +76,15 @@ class Xexpect:
         # Expect for prompt
         self.terminal.expect(self.prompt)
         # Search fo return code
-        matchObj = re.search(r"returncode=([\d+])", self.terminal.before)
+        matchObj = re.search(r"returncode=([\d]+)", self.terminal.before)
         if matchObj is not None:
             returncode = matchObj.group(1)
-            err_msg = f"{cmd} exited with returncode {returncode}"
+            err_msg = (
+                custom_err
+                if custom_err
+                else f"{cmd} exited with returncode {returncode}"
+            )
             self.log.error(err_msg)
-            if custom_err:
-                self.log.error(err_msg)
             assert False, err_msg
         else:
             index = 0
@@ -248,6 +250,10 @@ class Xexpect:
             )
             if index < err_index:
                 self.log.error(msgs[index])
+                if index == 1:
+                    self.log.error(
+                        f"Timed out at {timeout}s, while  expecting: {expected}"
+                    )
                 if err_msg:
                     self.log.error(err_msg)
                     raise Exception(err_msg)

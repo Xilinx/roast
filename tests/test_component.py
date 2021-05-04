@@ -43,8 +43,8 @@ class DummyTestSuite(TestSuiteBase):
 def test_component_interface(request):
     ts_name = "dummy_ts"
     sys_name = "dummy_sys"
-    register_plugin(ts_name, "testsuite", "tests.test_component:DummyTestSuite")
-    register_plugin(sys_name, "system", "tests.test_component:DummySystem")
+    register_plugin(ts_name, "testsuite", "test_component:DummyTestSuite")
+    register_plugin(sys_name, "system", "test_component:DummySystem")
 
     rootdir = request.config.rootdir.strpath
     fspath = request.node.fspath
