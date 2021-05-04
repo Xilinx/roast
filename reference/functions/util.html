@@ -56,9 +56,7 @@
   <link rel="stylesheet" href="../../_static/css/header-footer.min.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pro.min.css" media="all" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Fixtures in pytest-roast" href="pytest-roast.html" />
-    <link rel="prev" title="Scenario function" href="scenario.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 	</head>
 	<body>
 		<div class="xilinx-bs3"/>
@@ -306,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,21 +329,10 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Functions</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="confparser.html">confParser module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scenario.html">Scenario function</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Common utilities</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pytest-roast.html">Fixtures in pytest-roast</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ssh.html">ssh module</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../objects/index.html">Objects</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -397,10 +384,6 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../index.html">API Reference</a> &raquo;</li>
-        
-          <li><a href="index.html">Functions</a> &raquo;</li>
-        
       <li>Common utilities</li>
     
     
@@ -424,12 +407,11 @@
 <span id="common-utilities"></span><h1>Common utilities<a class="headerlink" href="#module-roast.utils.plugin" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="roast.utils.plugin.register_plugin">
-<code class="sig-prename descclassname">roast.utils.plugin.</code><code class="sig-name descname">register_plugin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">location</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">plugin_type</span></em>, <em class="sig-param"><span class="n">entry_point</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/plugin.html#register_plugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.plugin.register_plugin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Registers a plugin to the global working_set instance without needing to install.</p>
+<code class="sig-prename descclassname">roast.utils.plugin.</code><code class="sig-name descname">register_plugin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">plugin_type</span></em>, <em class="sig-param"><span class="n">entry_point</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/plugin.html#register_plugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.plugin.register_plugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers a plugin dynamically without needing to install as a package.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>location</strong> (<em>str</em>) – Full path to file that might be used on sys.path.</p></li>
 <li><p><strong>name</strong> (<em>str</em>) – Name of plugin to be referenced.</p></li>
 <li><p><strong>plugin_type</strong> (<em>str</em>) – Type to determine plugin namespace.</p></li>
 <li><p><strong>entry_point</strong> (<em>str</em>) – Entry point in the form: some.module:some.attr</p></li>
@@ -439,22 +421,32 @@
 <dd class="field-even"><p><strong>Exception</strong> – Raised when plugin_type is not supported.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <span class="target" id="module-roast.utils.logger"></span><dl class="py function">
 <dt id="roast.utils.logger.setup_logger">
-<code class="sig-prename descclassname">roast.utils.logger.</code><code class="sig-name descname">setup_logger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log_dirname</span></em>, <em class="sig-param"><span class="n">log_filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">console_level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">file_level</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/logger.html#setup_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.logger.setup_logger" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">roast.utils.logger.</code><code class="sig-name descname">setup_logger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log_dirname</span></em>, <em class="sig-param"><span class="n">log_filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">console_level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">file_level</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">console_fmt</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">file_fmt</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/logger.html#setup_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.logger.setup_logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>This defines two logging handlers - file at DEBUG level and console at INFO level.
-Any keyword arguments will be passed to logging.Formatter.</p>
+If any keyword arguments are provided, all other parameters will be discarded with both
+handlers set to the same format.</p>
+<p>The dictionaries for console_fmt and file_fmt are in the format:
+{“fmt”: &lt;format string&gt;, “datefmt”: &lt;format string&gt;, “style’: &lt;format string&gt;}</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>log_dirname</strong> (<em>str</em>) – Directory where log files will be written.</p></li>
 <li><p><strong>log_filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Name for log file. If not specified,
 name will be generated based on timestamp. Defaults to None.</p></li>
+<li><p><strong>console_level</strong> (<em>int</em>) – Logging level for console. Defaults to logging.INFO or 20.</p></li>
+<li><p><strong>file_level</strong> (<em>int</em>) – Logging level for file. Default to logging.DEBUG or 10.</p></li>
+<li><p><strong>console_fmt</strong> (<em>dict</em>) – Dictionary of formatting parameters.</p></li>
+<li><p><strong>file_fmt</strong> (<em>dict</em>) – Dictionary of file parameters.</p></li>
+<li><p><strong>**fmt</strong> (<em>str</em>) – Message format.</p></li>
+<li><p><strong>**datefmt</strong> (<em>str</em>) – Date format.</p></li>
+<li><p><strong>**style</strong> (<em>str</em>) – Style format.</p></li>
 </ul>
 </dd>
 </dl>
@@ -476,7 +468,7 @@ name will be generated based on timestamp. Defaults to None.</p></li>
 
 <dl class="py function">
 <dt id="roast.utils.roast_utils.check_if_string_in_file">
-<code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">check_if_string_in_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">string_to_search</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#check_if_string_in_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.check_if_string_in_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">check_if_string_in_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">string_to_search</span></em>, <em class="sig-param"><span class="n">search_flag</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#check_if_string_in_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.check_if_string_in_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if any line in the file contains given string</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -486,10 +478,23 @@ name will be generated based on timestamp. Defaults to None.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt id="roast.utils.roast_utils.colorstr_to_plainstr">
+<code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">colorstr_to_plainstr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#colorstr_to_plainstr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.colorstr_to_plainstr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conversion from colour string to plain string if any</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="roast.utils.roast_utils.convert_list">
 <code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">convert_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">argv</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#convert_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.convert_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>This api takes list/strings and
 returns list</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="roast.utils.roast_utils.copy_match_files">
+<code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">copy_match_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">regex</span></em>, <em class="sig-param"><span class="n">follow_src_dir</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">follow_symlinks</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#copy_match_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.copy_match_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>This api finds files matching the regular expression,
+and copies into the destination directory</p>
 </dd></dl>
 
 <dl class="py function">
@@ -505,7 +510,7 @@ returns list</p>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -523,7 +528,7 @@ returns list</p>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -551,6 +556,13 @@ of keys that the scenario mean.</p>
 <code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">find_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">search_file</span></em>, <em class="sig-param"><span class="n">search_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#find_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.find_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>This api find the file in sub-directories and returns
 absolute path of file, if file exists</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="roast.utils.roast_utils.find_files">
+<code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">find_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">search_pattern</span></em>, <em class="sig-param"><span class="n">search_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#find_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.find_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>This api find the files matching regex directories and returns
+absolute path of files, if file exists</p>
 </dd></dl>
 
 <dl class="py function">
@@ -882,7 +894,24 @@ exist uses the default value, and see if the value/default exists in the valid_l
 <dd class="field-odd"><p><strong>folderpath</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Path of the folder structure.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="roast.utils.roast_utils.mkfile">
+<code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">mkfile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em>, <em class="sig-param"><span class="n">silent_discard</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#mkfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.mkfile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Open an empty file, raises Error Message on demand</dt><dd><p>Equivalent to touch in shell</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>{string} -- Path of file</strong> (<em>filepath</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -890,7 +919,7 @@ exist uses the default value, and see if the value/default exists in the valid_l
 <dl class="py function">
 <dt id="roast.utils.roast_utils.overrides">
 <code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">overrides</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conf</span></em>, <em class="sig-param"><span class="n">var</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#overrides"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.overrides" title="Permalink to this definition">¶</a></dt>
-<dd><p>This api overrides the dictionary which contains same key’s</p>
+<dd><p>This api overrides the dictionary which contains same keys</p>
 </dd></dl>
 
 <dl class="py function">
@@ -908,7 +937,7 @@ exist uses the default value, and see if the value/default exists in the valid_l
 <dd class="field-odd"><p><strong>err_msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Error Message.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -922,7 +951,7 @@ exist uses the default value, and see if the value/default exists in the valid_l
 <dd class="field-odd"><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Message to be print.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -936,7 +965,7 @@ exist uses the default value, and see if the value/default exists in the valid_l
 <dd class="field-odd"><p><strong>warn_msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Warning Message.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -950,19 +979,25 @@ exist uses the default value, and see if the value/default exists in the valid_l
 <dd class="field-odd"><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Directory or file path.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="roast.utils.roast_utils.runcmd_p">
-<code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">runcmd_p</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmd</span></em>, <em class="sig-param"><span class="n">log</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cwd</span><span class="o">=</span><span class="default_value">'./'</span></em>, <em class="sig-param"><span class="n">expected_code</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#runcmd_p"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.runcmd_p" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">roast.utils.roast_utils.</code><code class="sig-name descname">runcmd_p</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmd</span></em>, <em class="sig-param"><span class="n">log</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cwd</span><span class="o">=</span><span class="default_value">'./'</span></em>, <em class="sig-param"><span class="n">expected_code</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">return_code</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/utils/roast_utils.html#runcmd_p"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.utils.roast_utils.runcmd_p" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sends command on to the console and raises assertion error if the
 command is not executed successfully.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>cmd</strong> (<em>str</em>) – Command to be executed.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmd</strong> (<em>str</em>) – Command to be executed.</p></li>
+<li><p><strong>log</strong> (<em>logger</em>) – logger to record debug prints</p></li>
+<li><p><strong>cwd</strong> (<em>str</em>) – PWD path to execute cmd</p></li>
+<li><p><strong>expected_code</strong> (<em>int</em>) – Expected return code value from the function</p></li>
+<li><p><strong>return_code</strong> (<em>boolean</em>) – True = returns cmd exit code, False = Asserts error</p></li>
+</ul>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><strong>Assertion error only when command execution fails</strong> – </p>
@@ -1010,7 +1045,7 @@ command is not executed successfully.</p>
 <dd><p>This api is to symlink file or directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1028,7 +1063,7 @@ command is not executed successfully.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1049,22 +1084,13 @@ command is not executed successfully.</p>
 	  
 	  <!-- Sphinx Page Footer block -->
   
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="pytest-roast.html" class="btn btn-neutral float-right" title="Fixtures in pytest-roast" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="scenario.html" class="btn btn-neutral float-left" title="Scenario function" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
 
   <hr/>
 
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

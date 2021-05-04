@@ -304,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,8 +331,8 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -397,9 +397,16 @@
            <div itemprop="articleBody">
             
   <h1>Source code for roast.utils.roast_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="c1">#</span>
+<span class="c1"># Copyright (c) 2020 Xilinx, Inc. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">git</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">fileinput</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
@@ -410,7 +417,6 @@
 <span class="kn">from</span> <span class="nn">filelock</span> <span class="kn">import</span> <span class="n">FileLock</span>
 <span class="kn">import</span> <span class="nn">itertools</span><span class="o">,</span> <span class="nn">collections.abc</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">import</span> <span class="nn">yamlordereddictloader</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">atexit</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -419,19 +425,29 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
 
 <span class="k">class</span> <span class="nc">Git</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">git_params</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">,</span> <span class="n">clone_once</span><span class="p">,</span> <span class="n">logfile</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">git_params</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">,</span> <span class="n">clone_once</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repo</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">branch</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">branch</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_path</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">sparse_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">patches</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">patchesDir</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">patchesDir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rev</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">rev</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_path</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sparse_path&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;patches&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patchesDir</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;patchesDir&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rev</span> <span class="o">=</span> <span class="n">git_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rev&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span> <span class="o">=</span> <span class="n">repo_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span> <span class="o">=</span> <span class="n">logfile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clone_once</span> <span class="o">=</span> <span class="n">clone_once</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;******************************************************&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;repo_url : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;branch : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sparse_path : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patches : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patchesDir : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">patchesDir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rev : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rev</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;repo_path : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;******************************************************&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span> <span class="o">=</span> <span class="n">get_base_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">)</span>
@@ -447,6 +463,7 @@
 
     <span class="k">def</span> <span class="nf">_clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cloning </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">no_checkout</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_path</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
         <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">repo_url</span><span class="p">,</span>
@@ -465,10 +482,6 @@
                 <span class="n">fd</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_path</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">checkout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">branch</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">last_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">rev_parse</span><span class="p">([</span><span class="s2">&quot;--verify&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">origin_commit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-            <span class="s2">&quot;-n 1&quot;</span><span class="p">,</span> <span class="s2">&quot;--pretty=format:%H - </span><span class="si">%a</span><span class="s2">n, </span><span class="si">%a</span><span class="s2">r : </span><span class="si">%s</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recurse_submodules&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;latest&quot;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">submodule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">submodules</span><span class="p">:</span>
                 <span class="n">submodule</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -478,7 +491,6 @@
     <span class="k">def</span> <span class="nf">checkout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rev</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">checkout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rev</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">last_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">rev_parse</span><span class="p">([</span><span class="s2">&quot;--verify&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">apply_patch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workDir</span><span class="p">):</span>
 
@@ -501,13 +513,12 @@
     <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s2">&quot;-xdf&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">run_gitcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ret_out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run_gitcmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">ret_out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the git command specified by the cmd input, in the specified repo</span>
 <span class="sd">        path.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            cmd (str): the git command to be executed</span>
-<span class="sd">            logger (logging.getLogger, optional): logger object</span>
 <span class="sd">            ret_out (bool, optional): decides if the output of git commands need</span>
 <span class="sd">                     to be returned for further processing. Defaults to False.</span>
 
@@ -518,15 +529,11 @@
         <span class="n">g</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">Git</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">))</span>
         <span class="n">cmd_list</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="n">stat</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">,</span> <span class="n">with_extended_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">stat</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">err</span>
         <span class="k">return</span> <span class="n">stat</span>
 
-    <span class="k">def</span> <span class="nf">git_update_repo</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ret_out</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">git_update_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ret_out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates the user provided repo to user specified tag or branch</span>
 <span class="sd">            or (branch and optional commit ID)</span>
 <span class="sd">            Note: if no tag, branch, commit is provided it updates the repo to</span>
@@ -537,7 +544,6 @@
 <span class="sd">            commit (str, optional): commit sha to check out, to be used with</span>
 <span class="sd">                    valid branch. Defaults to None.</span>
 <span class="sd">            tag (str, optional): tag that needs to be checked out. Defaults to None.</span>
-<span class="sd">            logger (logging.getLogger, optional): logger object. Defaults to None.</span>
 <span class="sd">            ret_out (bool, optional): boolean that decides if deatiled output of</span>
 <span class="sd">                    updating need to be returned. Defaults to False.</span>
 
@@ -560,12 +566,12 @@
         <span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="p">(</span><span class="n">gp</span><span class="p">)</span>
         <span class="n">git_commit</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">rev_parse</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">commit</span><span class="o">.</span><span class="n">hexsha</span><span class="p">,</span> <span class="n">short</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">git_branch</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">active_branch</span><span class="p">)</span>
+            <span class="n">git_branch</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">active_branch</span><span class="o">.</span><span class="n">name</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="n">git_branch</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">git_tag</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_gitcmd</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;git describe --exact-match </span><span class="si">{</span><span class="n">git_commit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span>
+                <span class="sa">f</span><span class="s2">&quot;git describe --exact-match </span><span class="si">{</span><span class="n">git_commit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">True</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="n">git</span><span class="o">.</span><span class="n">exc</span><span class="o">.</span><span class="n">GitCommandError</span><span class="p">:</span>
             <span class="n">git_tag</span> <span class="o">=</span> <span class="kc">None</span>
@@ -574,19 +580,17 @@
         <span class="c1"># Check if the repo is already in requested state</span>
         <span class="k">if</span> <span class="n">tag</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">git_tag</span> <span class="o">==</span> <span class="n">tag</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Not updating, repo already at required tag : </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Not updating, repo already at required tag : </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
                     <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">out</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">return</span>
         <span class="k">if</span> <span class="n">branch</span> <span class="ow">and</span> <span class="n">commit</span><span class="p">:</span>
             <span class="n">short_sha</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">rev_parse</span><span class="p">(</span><span class="n">commit</span><span class="p">,</span> <span class="n">short</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">git_branch</span> <span class="o">==</span> <span class="n">branch</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">git_commit</span> <span class="o">==</span> <span class="n">short_sha</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Not updating, repo already at branch </span><span class="si">{</span><span class="n">git_branch</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">git_commit</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">git_commit</span> <span class="o">==</span> <span class="n">short_sha</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Not updating, repo already at commit: </span><span class="si">{</span><span class="n">git_commit</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
                     <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">out</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -600,7 +604,7 @@
         <span class="k">elif</span> <span class="n">branch</span><span class="p">:</span>
             <span class="n">status</span> <span class="o">=</span> <span class="n">status</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_gitcmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;git checkout </span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="n">status</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_gitcmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;git pull origin </span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;updated branch: </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">active_branch</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;updated branch: </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">active_branch</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="n">commit</span><span class="p">:</span>
                 <span class="n">status</span> <span class="o">=</span> <span class="n">status</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_gitcmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;git checkout </span><span class="si">{</span><span class="n">commit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; checked out commit </span><span class="si">{</span><span class="n">commit</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -609,35 +613,77 @@
             <span class="n">status</span> <span class="o">=</span> <span class="n">status</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_gitcmd</span><span class="p">(</span><span class="s2">&quot;git pull origin master&quot;</span><span class="p">)</span>
             <span class="n">commit</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">rev_parse</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">commit</span><span class="o">.</span><span class="n">hexsha</span><span class="p">,</span> <span class="n">short</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;updated to master branch, commit </span><span class="si">{</span><span class="n">commit</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
             <span class="k">return</span> <span class="ow">not</span> <span class="n">status</span><span class="p">,</span> <span class="n">out</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="n">status</span>
 
     <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span>
-        <span class="c1"># repo_url = self.repo.git.remote(&quot;get-url&quot;, &quot;origin&quot;)</span>
-        <span class="c1"># FIXME due to git version not supporting the command (Required git version 2.23.0)</span>
-        <span class="n">repo_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;--get&quot;</span><span class="p">,</span> <span class="s2">&quot;remote.origin.url&quot;</span><span class="p">)</span>
-        <span class="n">repo_branch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">branch</span><span class="p">()</span>
+        <span class="c1"># print log for a valid git repo</span>
+        <span class="k">if</span> <span class="n">is_git_repo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">)</span>
+            <span class="c1"># repo_url = self.repo.git.remote(&quot;get-url&quot;, &quot;origin&quot;)</span>
+            <span class="c1"># FIXME due to git version not supporting the command (Required git version 2.23.0)</span>
+            <span class="n">repo_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;--get&quot;</span><span class="p">,</span> <span class="s2">&quot;remote.origin.url&quot;</span><span class="p">)</span>
+            <span class="n">remote</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
+            <span class="n">repo_current_branch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">rev_parse</span><span class="p">([</span><span class="s2">&quot;--abbrev-ref&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_commits</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">origin_commit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">repo_current_branch</span> <span class="o">!=</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">:</span>
+                <span class="n">repo_branch_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="s2">&quot;--pretty=format:</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="c1"># Get all the remote branches</span>
+                <span class="n">remote_branches</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">branch</span>
+                    <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">repo_branch_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="n">remote</span> <span class="ow">in</span> <span class="n">branch</span>
+                <span class="p">]</span>
+                <span class="c1"># Get the latest remote branch</span>
+                <span class="n">remote_branches</span> <span class="o">=</span> <span class="n">remote_branches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">remote_branches</span><span class="p">:</span>
+                    <span class="n">branch</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;[() ]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">branch</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">remote</span> <span class="ow">in</span> <span class="n">branch</span> <span class="ow">and</span> <span class="s2">&quot;HEAD&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">branch</span><span class="p">:</span>
+                        <span class="n">remote_branch</span> <span class="o">=</span> <span class="n">branch</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">local_commits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">remote_branch</span><span class="si">}</span><span class="s2">...</span><span class="si">{</span><span class="n">repo_current_branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s1">&#39;--pretty=format:&quot;%H - </span><span class="si">%a</span><span class="s1">n, </span><span class="si">%a</span><span class="s1">r : </span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">origin_commit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">remote_branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-n 1&quot;</span><span class="p">,</span>
+                    <span class="s1">&#39;--pretty=format:&quot;%H - </span><span class="si">%a</span><span class="s1">n, </span><span class="si">%a</span><span class="s1">r : </span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">repo_current_branch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">branch</span><span class="p">()</span>
+                <span class="n">match_obj</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                    <span class="s2">&quot;HEAD detached (at|from) ([a-z0-9]+)&quot;</span><span class="p">,</span> <span class="n">repo_current_branch</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">match_obj</span><span class="p">:</span>
+                    <span class="n">repo_branch_commit</span> <span class="o">=</span> <span class="n">match_obj</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">repo_head_commit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">rev_parse</span><span class="p">([</span><span class="s2">&quot;--verify&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">local_commits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo_branch_commit</span><span class="si">}</span><span class="s2">...</span><span class="si">{</span><span class="n">repo_head_commit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="s1">&#39;--pretty=format:&quot;%H - </span><span class="si">%a</span><span class="s1">n, </span><span class="si">%a</span><span class="s1">r : </span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">origin_commit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="s2">&quot;-n 1&quot;</span><span class="p">,</span>
+                        <span class="n">repo_branch_commit</span><span class="p">,</span>
+                        <span class="s1">&#39;--pretty=format:&quot;%H - </span><span class="si">%a</span><span class="s1">n, </span><span class="si">%a</span><span class="s1">r : </span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_commit</span><span class="p">:</span>
+                    <span class="n">remote</span> <span class="o">=</span> <span class="s2">&quot;HEAD&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">origin_commit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="s2">&quot;-n 1&quot;</span><span class="p">,</span> <span class="s2">&quot;--pretty=format:%H - </span><span class="si">%a</span><span class="s2">n, </span><span class="si">%a</span><span class="s2">r : </span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">******************************************************</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; REPO URL: </span><span class="si">{</span><span class="n">repo_url</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; BRANCH: </span><span class="si">{</span><span class="n">repo_branch</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; ORIGIN_COMMIT: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_commit</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-            <span class="n">commit_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">last_hash</span><span class="si">}</span><span class="s2">..HEAD&quot;</span><span class="p">,</span> <span class="s2">&quot;--pretty=format:%H - </span><span class="si">%a</span><span class="s2">n, </span><span class="si">%a</span><span class="s2">r : </span><span class="si">%s</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">commit_diff</span><span class="p">:</span>
-                <span class="n">commit_diff</span> <span class="o">=</span> <span class="n">commit_diff</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot; COMMIT DIFF:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">commit_diff</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">******************************************************</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;******************************************************&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; REPO URL: </span><span class="si">{</span><span class="n">repo_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; BRANCH: </span><span class="si">{</span><span class="n">repo_current_branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_commits</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; LOCAL_COMMITS: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">local_commits</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">remote</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> COMMIT: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_commit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;******************************************************&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="is_git_repo"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.is_git_repo">[docs]</a><span class="k">def</span> <span class="nf">is_git_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
@@ -657,11 +703,9 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<span class="k">def</span> <span class="nf">clone</span><span class="p">(</span>
-    <span class="n">git_params</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">,</span> <span class="n">logfile</span><span class="p">,</span> <span class="n">workDir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clone_once</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-<span class="p">):</span>
+<span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="n">git_params</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">,</span> <span class="n">workDir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clone_once</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-    <span class="n">git</span> <span class="o">=</span> <span class="n">Git</span><span class="p">(</span><span class="n">git_params</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">,</span> <span class="n">clone_once</span><span class="p">,</span> <span class="n">logfile</span><span class="p">)</span>
+    <span class="n">git</span> <span class="o">=</span> <span class="n">Git</span><span class="p">(</span><span class="n">git_params</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">,</span> <span class="n">clone_once</span><span class="p">)</span>
 
     <span class="n">git</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -671,7 +715,7 @@
 
         <span class="n">git</span><span class="o">.</span><span class="n">apply_patch</span><span class="p">(</span><span class="n">workDir</span><span class="p">)</span>
 
-        <span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
+    <span class="n">git</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="surround_double_quotes"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.surround_double_quotes">[docs]</a><span class="k">def</span> <span class="nf">surround_double_quotes</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -761,7 +805,7 @@
 
     <span class="c1"># Test for the mandatory args</span>
     <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">mandatory_args</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="ow">is</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">surround_double_quotes</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;is not defined&quot;</span>
             <span class="n">print_err_exit</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
@@ -987,6 +1031,27 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="mkfile"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.mkfile">[docs]</a><span class="k">def</span> <span class="nf">mkfile</span><span class="p">(</span><span class="n">fname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">silent_discard</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Open an empty file, raises Error Message on demand</span>
+<span class="sd">       Equivalent to touch in shell</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        filepath {string} -- Path of file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_successful</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+        <span class="n">is_successful</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">silent_discard</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_successful</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> Created File&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> Unable to create file &quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="is_error"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.is_error">[docs]</a><span class="k">def</span> <span class="nf">is_error</span><span class="p">(</span><span class="n">stderr_msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Return True if the error string not found else exits with error message.</span>
 
@@ -1010,6 +1075,24 @@
 <span class="k">def</span> <span class="nf">copy_file</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">is_file</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="n">follow_symlinks</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="copy_match_files"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.copy_match_files">[docs]</a><span class="k">def</span> <span class="nf">copy_match_files</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">regex</span><span class="p">,</span> <span class="n">follow_src_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This api finds files matching the regular expression,</span>
+<span class="sd">    and copies into the destination directory&quot;&quot;&quot;</span>
+    <span class="n">mkdir</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+    <span class="c1"># Find all files with match patern</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">find_files</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+    <span class="c1"># check for is_file</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">follow_src_dir</span><span class="p">:</span>
+            <span class="n">relpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+            <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">relpath</span><span class="p">)</span>
+            <span class="n">dest_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="n">dest_dir</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="n">follow_symlinks</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="n">follow_symlinks</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">cp_all_files</span><span class="p">(</span>
@@ -1126,17 +1209,21 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">output</span>
         <span class="n">returncode</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">returncode</span>
     <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">returncode</span>
 
 
-<div class="viewcode-block" id="runcmd_p"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.runcmd_p">[docs]</a><span class="k">def</span> <span class="nf">runcmd_p</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="s2">&quot;./&quot;</span><span class="p">,</span> <span class="n">expected_code</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="runcmd_p"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.runcmd_p">[docs]</a><span class="k">def</span> <span class="nf">runcmd_p</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="s2">&quot;./&quot;</span><span class="p">,</span> <span class="n">expected_code</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_code</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sends command on to the console and raises assertion error if the</span>
 <span class="sd">    command is not executed successfully.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cmd (str): Command to be executed.</span>
+<span class="sd">        log (logger): logger to record debug prints</span>
+<span class="sd">        cwd (str): PWD path to execute cmd</span>
+<span class="sd">        expected_code (int): Expected return code value from the function</span>
+<span class="sd">        return_code (boolean): True = returns cmd exit code, False = Asserts error</span>
 <span class="sd">    Raises:</span>
 <span class="sd">        Assertion error only when command execution fails</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1153,6 +1240,7 @@
         <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
         <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">bufsize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">executable</span><span class="o">=</span><span class="s2">&quot;/bin/bash&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>  <span class="c1"># b&#39;\n&#39;-separated lines</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
@@ -1160,7 +1248,12 @@
     <span class="k">if</span> <span class="n">retcode</span> <span class="o">!=</span> <span class="n">expected_code</span><span class="p">:</span>
         <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> failed with return code </span><span class="si">{</span><span class="n">retcode</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="n">expected_code</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="n">err_msg</span></div>
+        <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">retcode</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="n">err_msg</span>
+    <span class="k">elif</span> <span class="n">return_code</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">retcode</span></div>
 
 
 <span class="c1"># Function to add newline in file.</span>
@@ -1255,6 +1348,12 @@
 <span class="sd">       dict_name: Dictionary name</span>
 <span class="sd">       key: Key name</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;has_key is deprecated; use membership test operation `in` instead.&quot;</span><span class="p">,</span>
+        <span class="ne">DeprecationWarning</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1276,7 +1375,7 @@
 
 
 <div class="viewcode-block" id="get_var"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_var">[docs]</a><span class="k">def</span> <span class="nf">get_var</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">raise_except</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; This api returns vale of key in config.</span>
+    <span class="sd">&quot;&quot;&quot;This api returns vale of key in config.</span>
 <span class="sd">    If key is not present, it will return False if raise_except is False.</span>
 <span class="sd">    else it will raise exception.</span>
 
@@ -1292,7 +1391,7 @@
 
     <span class="n">warn</span><span class="p">(</span>
         <span class="s2">&quot;get_var is deprecated; use dictionary .get() method instead.&quot;</span><span class="p">,</span>
-        <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+        <span class="ne">DeprecationWarning</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">has_key</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
@@ -1354,7 +1453,7 @@
 
 
 <div class="viewcode-block" id="convert_list"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.convert_list">[docs]</a><span class="k">def</span> <span class="nf">convert_list</span><span class="p">(</span><span class="o">*</span><span class="n">argv</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api takes list/strings and</span>
+    <span class="sd">&quot;&quot;&quot;This api takes list/strings and</span>
 <span class="sd">    returns list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ret_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1379,8 +1478,7 @@
 
 
 <div class="viewcode-block" id="symlink"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.symlink">[docs]</a><span class="k">def</span> <span class="nf">symlink</span><span class="p">(</span><span class="n">src_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dst_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; This api is to symlink file or directory.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;This api is to symlink file or directory.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">src_file</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">src_file</span><span class="p">)</span>
@@ -1392,7 +1490,7 @@
 
 
 <div class="viewcode-block" id="get_relpath_tcrepo"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_relpath_tcrepo">[docs]</a><span class="k">def</span> <span class="nf">get_relpath_tcrepo</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api takes file path and returns</span>
+    <span class="sd">&quot;&quot;&quot;This api takes file path and returns</span>
 <span class="sd">    relative path with reference to tcRepo/ dir</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># File relative path</span>
@@ -1410,21 +1508,21 @@
 
 
 <div class="viewcode-block" id="get_base_name"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_base_name">[docs]</a><span class="k">def</span> <span class="nf">get_base_name</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api takes rel path or full path and returns</span>
+    <span class="sd">&quot;&quot;&quot;This api takes rel path or full path and returns</span>
 <span class="sd">    base name&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_dir_name"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_dir_name">[docs]</a><span class="k">def</span> <span class="nf">get_dir_name</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api takes file path and returns it&#39;s directory </span>
-<span class="sd">    path &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;This api takes file path and returns it&#39;s directory</span>
+<span class="sd">    path&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_dirs"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_dirs">[docs]</a><span class="k">def</span> <span class="nf">get_dirs</span><span class="p">(</span><span class="n">fpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">exclude_dirs</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; This api takes path and exclude dirs list,</span>
-<span class="sd">	returns list of dirs available in provided path</span>
-<span class="sd">	by default it exclude dirs which startswith (&#39;.&#39;, &#39;__&#39;)</span>
+    <span class="sd">&quot;&quot;&quot;This api takes path and exclude dirs list,</span>
+<span class="sd">    returns list of dirs available in provided path</span>
+<span class="sd">    by default it exclude dirs which startswith (&#39;.&#39;, &#39;__&#39;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span>
@@ -1463,20 +1561,25 @@
 
 
 <div class="viewcode-block" id="get_abs_path"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_abs_path">[docs]</a><span class="k">def</span> <span class="nf">get_abs_path</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api takes file path and returns it&#39;s absolute</span>
-<span class="sd">    path &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;This api takes file path and returns it&#39;s absolute</span>
+<span class="sd">    path&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_original_path"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_original_path">[docs]</a><span class="k">def</span> <span class="nf">get_original_path</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api takes file path and returns it&#39;s original</span>
-<span class="sd">    path. It is equivalent to readlink &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;This api takes file path and returns it&#39;s original</span>
+<span class="sd">    path. It is equivalent to readlink&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="overrides"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.overrides">[docs]</a><span class="k">def</span> <span class="nf">overrides</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api overrides the dictionary which contains same key&#39;s &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">has_key</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This api overrides the dictionary which contains same keys&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">var</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">conf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">elif</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">conf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
     <span class="k">return</span> <span class="n">conf</span></div>
@@ -1484,15 +1587,22 @@
 
 <div class="viewcode-block" id="find_file"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.find_file">[docs]</a><span class="k">def</span> <span class="nf">find_file</span><span class="p">(</span><span class="n">search_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">search_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This api find the file in sub-directories and returns</span>
-<span class="sd">       absolute path of file, if file exists &quot;&quot;&quot;</span>
+<span class="sd">    absolute path of file, if file exists&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">File</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">search_path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**/</span><span class="si">{</span><span class="n">search_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">File</span></div>
 
 
+<div class="viewcode-block" id="find_files"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.find_files">[docs]</a><span class="k">def</span> <span class="nf">find_files</span><span class="p">(</span><span class="n">search_pattern</span><span class="p">,</span> <span class="n">search_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This api find the files matching regex directories and returns</span>
+<span class="sd">    absolute path of files, if file exists&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">search_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">search_pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="get_test_params"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_test_params">[docs]</a><span class="k">def</span> <span class="nf">get_test_params</span><span class="p">(</span><span class="n">mydict</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[]):</span>
-    <span class="sd">&quot;&quot;&quot; This api converts a dict of lists into combinations</span>
-<span class="sd">        keys and values. This can be used for dicts with</span>
-<span class="sd">        any number of levels &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;This api converts a dict of lists into combinations</span>
+<span class="sd">    keys and values. This can be used for dicts with</span>
+<span class="sd">    any number of levels&quot;&quot;&quot;</span>
     <span class="n">lists</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">mydict</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1513,12 +1623,14 @@
     <span class="k">return</span> <span class="n">lists</span></div>
 
 
-<div class="viewcode-block" id="check_if_string_in_file"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.check_if_string_in_file">[docs]</a><span class="k">def</span> <span class="nf">check_if_string_in_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">string_to_search</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Check if any line in the file contains given string &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="check_if_string_in_file"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.check_if_string_in_file">[docs]</a><span class="k">def</span> <span class="nf">check_if_string_in_file</span><span class="p">(</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">string_to_search</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">search_flag</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Check if any line in the file contains given string&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">read_obj</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">read_obj</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">string_to_search</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">file_data</span> <span class="o">=</span> <span class="n">read_obj</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">string_to_search</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">search_flag</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
@@ -1539,9 +1651,9 @@
 
 
 <div class="viewcode-block" id="flatten_nested_items"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.flatten_nested_items">[docs]</a><span class="k">def</span> <span class="nf">flatten_nested_items</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Flatten a nested_dict.  iterate through nested dictionary</span>
-<span class="sd">        (with iterkeys() method) and return with nested keys</span>
-<span class="sd">        flattened into a tuple &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Flatten a nested_dict.  iterate through nested dictionary</span>
+<span class="sd">    (with iterkeys() method) and return with nested keys</span>
+<span class="sd">    flattened into a tuple&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">hexversion</span> <span class="o">&lt;</span> <span class="mh">0x03000000</span><span class="p">:</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">iterkeys</span>
         <span class="n">keystr</span> <span class="o">=</span> <span class="s2">&quot;iterkeys&quot;</span>
@@ -1558,7 +1670,7 @@
 
 
 <div class="viewcode-block" id="get_flattened_dict"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.get_flattened_dict">[docs]</a><span class="k">def</span> <span class="nf">get_flattened_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">remove_element</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api converts a given nested dictionary into</span>
+    <span class="sd">&quot;&quot;&quot;This api converts a given nested dictionary into</span>
 <span class="sd">    a flattened one, by converting all the nested keys into</span>
 <span class="sd">    combinations of tuple keys.</span>
 
@@ -1597,7 +1709,7 @@
 
 
 <div class="viewcode-block" id="filter_dict"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.filter_dict">[docs]</a><span class="k">def</span> <span class="nf">filter_dict</span><span class="p">(</span><span class="n">mydict</span><span class="p">,</span> <span class="n">scenario_list</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api filters dictionary based on given scenario list. The scenarios in</span>
+    <span class="sd">&quot;&quot;&quot;This api filters dictionary based on given scenario list. The scenarios in</span>
 <span class="sd">    the given list are again a list of keys that has to be checked with the</span>
 <span class="sd">    flattened tuple keys of a nested dict.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1613,7 +1725,7 @@
 
 
 <div class="viewcode-block" id="filter_keys"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.filter_keys">[docs]</a><span class="k">def</span> <span class="nf">filter_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This api is used to take a string or a list of one string and split it</span>
+    <span class="sd">&quot;&quot;&quot;This api is used to take a string or a list of one string and split it</span>
 <span class="sd">    appropriately to get the list of keys to look for while filtering a</span>
 <span class="sd">    dictionary. It is first split on basis of semicolon(;) which acts like a</span>
 <span class="sd">    separator of scenarios given. Next it&#39;s split on comma which is the list</span>
@@ -1631,11 +1743,57 @@
     <span class="k">return</span> <span class="n">filtered_keys</span></div>
 
 
+<span class="k">def</span> <span class="nf">get_config_data</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">temp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">config</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">first</span><span class="p">,</span> <span class="n">rest</span> <span class="o">=</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">first</span><span class="p">,</span> <span class="n">rest</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">rest</span><span class="p">:</span>
+        <span class="c1"># if rest is not empty, run the function recursively</span>
+        <span class="k">return</span> <span class="n">get_config_data</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">rest</span><span class="p">,</span> <span class="n">temp</span><span class="p">[</span><span class="n">first</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">temp_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">temp_dict</span><span class="p">[</span><span class="n">first</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">is_filesystem_nfs</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;df -P -T </span><span class="si">{</span><span class="n">dir_path</span><span class="si">}</span><span class="s2"> | tail -n +2 | awk &#39;</span><span class="se">{{</span><span class="s2">print $2</span><span class="se">}}</span><span class="s2">&#39;&quot;</span>
+    <span class="n">filesystem</span><span class="p">,</span> <span class="n">returncode</span> <span class="o">=</span> <span class="n">check_output</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filesystem</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;nfs&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
 <div class="viewcode-block" id="parse_config"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.parse_config">[docs]</a><span class="k">def</span> <span class="nf">parse_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Parse config for string interpolation&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Parse config for string interpolation&quot;&quot;&quot;</span>
 
     <span class="n">config</span><span class="p">[</span><span class="s2">&quot;tmp_value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
     <span class="k">return</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;tmp_value&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="colorstr_to_plainstr"><a class="viewcode-back" href="../../../reference/functions/util.html#roast.utils.roast_utils.colorstr_to_plainstr">[docs]</a><span class="k">def</span> <span class="nf">colorstr_to_plainstr</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Conversion from colour string to plain string if any&quot;&quot;&quot;</span>
+    <span class="n">ansi_escape</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\x1b(\[.*?[@-~]|\].*?(\x07|\x1b</span><span class="se">\\</span><span class="s2">))&quot;</span><span class="p">)</span>
+    <span class="n">format_string</span> <span class="o">=</span> <span class="n">ansi_escape</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">format_string</span></div>
+
+
+<span class="k">def</span> <span class="nf">rsync</span><span class="p">(</span><span class="n">console</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">exclude_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.git*&quot;</span><span class="p">]):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rsync -aqv </span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">exclude_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">exclude</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">exclude_list</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --exclude=</span><span class="se">{{</span><span class="si">{</span><span class="n">exclude</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">exclude_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">exclude</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">exclude_list</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;  --exclude=</span><span class="si">{</span><span class="n">exclude</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">runcmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">FileAdapter</span><span class="p">:</span>
@@ -1678,7 +1836,7 @@
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

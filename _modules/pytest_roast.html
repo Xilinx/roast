@@ -304,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,8 +331,8 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -397,115 +397,33 @@
            <div itemprop="articleBody">
             
   <h1>Source code for pytest_roast</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span></span><span class="c1">#</span>
+<span class="c1"># Copyright (c) 2020 Xilinx, Inc. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="c1">#</span>
+
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">pytest</span>
-<span class="kn">from</span> <span class="nn">_pytest.mark.legacy</span> <span class="kn">import</span> <span class="n">matchkeyword</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">from</span> <span class="nn">config</span> <span class="kn">import</span> <span class="n">ConfigurationSet</span>
+<span class="kn">from</span> <span class="nn">config</span> <span class="kn">import</span> <span class="n">ConfigurationSet</span><span class="p">,</span> <span class="n">InterpolateEnumType</span>
 <span class="kn">from</span> <span class="nn">roast.confParser</span> <span class="kn">import</span> <span class="n">generate_conf</span>
 <span class="kn">from</span> <span class="nn">roast.component.basebuild</span> <span class="kn">import</span> <span class="n">Basebuild</span>
-<span class="kn">from</span> <span class="nn">roast.component</span> <span class="kn">import</span> <span class="n">scenario</span><span class="p">,</span> <span class="n">Scenario</span>
+<span class="kn">from</span> <span class="nn">roast.component.scenario</span> <span class="kn">import</span> <span class="n">scenario</span><span class="p">,</span> <span class="n">Scenario</span>
 <span class="kn">from</span> <span class="nn">roast.component.board.board</span> <span class="kn">import</span> <span class="n">Board</span>
-<span class="kn">from</span> <span class="nn">roast.utils</span> <span class="kn">import</span> <span class="n">overrides</span><span class="p">,</span> <span class="n">has_key</span><span class="p">,</span> <span class="n">filter_keys</span><span class="p">,</span> <span class="n">load_yaml</span><span class="p">,</span> <span class="n">filter_dict</span>
 
 
 <span class="k">def</span> <span class="nf">pytest_addoption</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span><span class="s2">&quot;--override&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span><span class="s2">&quot;--select&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
-        <span class="s2">&quot;--select_filter&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span><span class="s2">&quot;--unselect&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
-        <span class="s2">&quot;--unselect_filter&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span><span class="s2">&quot;--machine&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">pytest_collection_modifyitems</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
-
-    <span class="k">for</span> <span class="n">option_name</span><span class="p">,</span> <span class="n">should_select</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;select&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;unselect&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]:</span>
-        <span class="n">is_file</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">select_expr</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="n">option_name</span><span class="p">)</span>
-        <span class="n">filter_list</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">option_name</span><span class="si">}</span><span class="s2">_filter&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">select_expr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">continue</span>
-
-        <span class="c1"># Search for file based on &#39;.&#39; presence.</span>
-        <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">select_expr</span><span class="p">):</span>
-            <span class="n">selection_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">select_expr</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">selection_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">selection_file_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-                <span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
-
-                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">selection_file_path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span>
-                    <span class="n">selection_file_path</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.yaml&quot;</span><span class="p">):</span>
-
-                    <span class="n">filter_keys</span> <span class="o">=</span> <span class="n">filter_keys</span><span class="p">(</span><span class="n">filter_list</span><span class="p">)</span>
-                    <span class="n">test_data</span> <span class="o">=</span> <span class="n">load_yaml</span><span class="p">(</span><span class="n">selection_file_path</span><span class="p">)</span>
-                    <span class="n">test_list</span> <span class="o">=</span> <span class="n">filter_dict</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">filter_keys</span><span class="p">)</span>
-                    <span class="n">test_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">test_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">test_name</span> <span class="ow">in</span> <span class="n">test_list</span><span class="p">}</span>
-
-                <span class="k">else</span><span class="p">:</span>
-
-                    <span class="k">with</span> <span class="n">selection_file_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
-                        <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span>
-                    <span class="p">)</span> <span class="k">as</span> <span class="n">selection_file</span><span class="p">:</span>
-                        <span class="n">test_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">test_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">test_name</span> <span class="ow">in</span> <span class="n">selection_file</span><span class="p">}</span>
-
-        <span class="n">mystr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">select_expr</span><span class="p">))</span>
-        <span class="c1"># Check for regex in string</span>
-        <span class="n">is_regex</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">all</span><span class="p">((</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mystr</span><span class="o">.</span><span class="n">split</span><span class="p">())))</span>
-
-        <span class="n">seen_test_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">selected_items</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">deselected_items</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">is_file</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">test_names</span> <span class="ow">or</span> <span class="n">item</span><span class="o">.</span><span class="n">nodeid</span> <span class="ow">in</span> <span class="n">test_names</span><span class="p">:</span>
-                    <span class="n">selected_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">deselected_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">mysrch</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">mystr</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">is_regex</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">mysrch</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">))</span> <span class="ow">and</span> <span class="n">mysrch</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">nodeid</span><span class="p">):</span>
-                        <span class="n">selected_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">deselected_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">matchkeyword</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">mystr</span><span class="p">):</span>
-                        <span class="n">selected_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">deselected_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-
-            <span class="n">seen_test_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">seen_test_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">nodeid</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">should_select</span><span class="p">:</span>
-            <span class="c1"># We are deselecting, flip collections</span>
-            <span class="n">selected_items</span><span class="p">,</span> <span class="n">deselected_items</span> <span class="o">=</span> <span class="n">deselected_items</span><span class="p">,</span> <span class="n">selected_items</span>
-
-        <span class="c1"># Slice assignment is required since `items` needs to be modified in place</span>
-        <span class="n">items</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">selected_items</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">hook</span><span class="o">.</span><span class="n">pytest_deselected</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">deselected_items</span><span class="p">)</span>
-
-
 <span class="k">def</span> <span class="nf">pytest_configure</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="n">config</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;override&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;override&quot;</span><span class="p">))</span>
-    <span class="n">config</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;machine&quot;</span><span class="p">))</span>
-
-
-<div class="viewcode-block" id="get_cmdl_machine_opt"><a class="viewcode-back" href="../reference/functions/pytest-roast.html#pytest_roast.get_cmdl_machine_opt">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<span class="k">def</span> <span class="nf">get_cmdl_machine_opt</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="n">machine</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">machine</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">machine</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">override</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;override&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;override&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="p">)</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">machine</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;machine&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;machine&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="create_configuration"><a class="viewcode-back" href="../reference/functions/pytest-roast.html#pytest_roast.create_configuration">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
@@ -514,13 +432,20 @@
         <span class="n">test_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">base_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">machine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">interpolate_type</span><span class="o">=</span><span class="n">InterpolateEnumType</span><span class="o">.</span><span class="n">STANDARD</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigurationSet</span><span class="p">:</span>
         <span class="n">rootdir</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">rootdir</span><span class="o">.</span><span class="n">strpath</span>
         <span class="n">fspath</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">fspath</span>
         <span class="k">if</span> <span class="n">test_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">test_name</span> <span class="o">=</span> <span class="n">get_test_name</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">overrides</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;override&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">overrides</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">overrides</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">override</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">overrides</span> <span class="o">=</span> <span class="n">overrides</span> <span class="o">+</span> <span class="n">pytest</span><span class="o">.</span><span class="n">override</span>
+        <span class="k">if</span> <span class="n">machine</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">machine</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">machine</span>
         <span class="k">return</span> <span class="n">generate_conf</span><span class="p">(</span>
             <span class="n">rootdir</span><span class="p">,</span>
             <span class="n">fspath</span><span class="p">,</span>
@@ -529,6 +454,7 @@
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
             <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
             <span class="n">machine</span><span class="o">=</span><span class="n">machine</span><span class="p">,</span>
+            <span class="n">interpolate_type</span><span class="o">=</span><span class="n">interpolate_type</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_cfg</span></div>
@@ -548,10 +474,17 @@
         <span class="n">test_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">base_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">machine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">interpolate_type</span><span class="o">=</span><span class="n">InterpolateEnumType</span><span class="o">.</span><span class="n">STANDARD</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scenario</span><span class="p">:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">create_configuration</span><span class="p">(</span>
-            <span class="n">test_name</span><span class="o">=</span><span class="n">test_name</span><span class="p">,</span> <span class="n">base_params</span><span class="o">=</span><span class="n">base_params</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">machine</span><span class="o">=</span><span class="n">machine</span>
+            <span class="n">test_name</span><span class="o">=</span><span class="n">test_name</span><span class="p">,</span>
+            <span class="n">base_params</span><span class="o">=</span><span class="n">base_params</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
+            <span class="n">machine</span><span class="o">=</span><span class="n">machine</span><span class="p">,</span>
+            <span class="n">interpolate_type</span><span class="o">=</span><span class="n">interpolate_type</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">scenario</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
@@ -560,19 +493,38 @@
 
 <span class="c1"># Fixtures for board</span>
 <span class="c1"># This fixture preserves board throughout the session</span>
-<div class="viewcode-block" id="board_session"><a class="viewcode-back" href="../reference/functions/pytest-roast.html#pytest_roast.board_session">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">board_session</span><span class="p">():</span>
-    <span class="k">def</span> <span class="nf">_board_session</span><span class="p">(</span><span class="n">board_type</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Board</span><span class="p">(</span><span class="n">board_type</span><span class="p">)</span><span class="o">.</span><span class="n">driver</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">host_board_session</span><span class="p">():</span>
+    <span class="n">board_obj</span> <span class="o">=</span> <span class="n">Board</span><span class="p">(</span><span class="s2">&quot;host_target&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">driver</span>
+    <span class="k">yield</span> <span class="n">board_obj</span>
 
-    <span class="k">return</span> <span class="n">_board_session</span></div>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">network_board_session</span><span class="p">():</span>
+    <span class="n">board_obj</span> <span class="o">=</span> <span class="n">Board</span><span class="p">(</span><span class="s2">&quot;network_target&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">driver</span>
+    <span class="k">yield</span> <span class="n">board_obj</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">systest_board_session</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">board_obj</span> <span class="o">=</span> <span class="n">Board</span><span class="p">(</span><span class="s2">&quot;systest&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">driver</span>
+        <span class="k">yield</span> <span class="n">board_obj</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="kc">None</span>
 
 
 <div class="viewcode-block" id="get_board"><a class="viewcode-back" href="../reference/functions/pytest-roast.html#pytest_roast.get_board">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_board</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">board_session</span><span class="p">,</span> <span class="n">create_configuration</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_board</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">,</span>
+    <span class="n">host_board_session</span><span class="p">,</span>
+    <span class="n">network_board_session</span><span class="p">,</span>
+    <span class="n">systest_board_session</span><span class="p">,</span>
+    <span class="n">create_configuration</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">create_configuration</span><span class="p">()</span>
     <span class="n">warn</span><span class="p">(</span>
-        <span class="s2">&quot;The &#39;get_board&#39; fixture will be deprecated in 2.0. Try the &#39;board&#39; fixture that doesn&#39;t call Basebuild.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;The &#39;get_board&#39; fixture has been deprecated. Migrate to the &#39;board&#39; fixture that doesn&#39;t call Basebuild.&quot;</span><span class="p">,</span>
         <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -586,12 +538,24 @@
         <span class="n">base_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">create_configuration</span><span class="p">(</span>
-            <span class="n">test_name</span><span class="o">=</span><span class="n">test_name</span><span class="p">,</span> <span class="n">base_params</span><span class="o">=</span><span class="n">base_params</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">machine</span><span class="o">=</span><span class="n">machine</span>
+            <span class="n">test_name</span><span class="o">=</span><span class="n">test_name</span><span class="p">,</span>
+            <span class="n">base_params</span><span class="o">=</span><span class="n">base_params</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
+            <span class="n">machine</span><span class="o">=</span><span class="n">machine</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">Basebuild</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">setup</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">sboard</span> <span class="o">=</span> <span class="n">board_session</span><span class="p">(</span><span class="n">board_type</span><span class="o">=</span><span class="n">board_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">board_type</span> <span class="o">==</span> <span class="s2">&quot;network_target&quot;</span><span class="p">:</span>
+            <span class="n">sboard</span> <span class="o">=</span> <span class="n">network_board_session</span>
+        <span class="k">elif</span> <span class="n">board_type</span> <span class="o">==</span> <span class="s2">&quot;host_target&quot;</span><span class="p">:</span>
+            <span class="n">sboard</span> <span class="o">=</span> <span class="n">host_board_session</span>
+        <span class="k">elif</span> <span class="n">board_type</span> <span class="o">==</span> <span class="s2">&quot;systest&quot;</span><span class="p">:</span>
+            <span class="n">sboard</span> <span class="o">=</span> <span class="n">systest_board_session</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Board type </span><span class="si">{</span><span class="n">board_type</span><span class="si">}</span><span class="s2"> is not supported.&quot;</span><span class="p">)</span>
         <span class="n">sboard</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="n">sboard</span><span class="o">.</span><span class="n">reboot</span> <span class="o">=</span> <span class="n">reboot</span>
         <span class="k">if</span> <span class="n">sboard</span><span class="o">.</span><span class="n">serial</span><span class="p">:</span>
@@ -607,7 +571,13 @@
 
 
 <div class="viewcode-block" id="board"><a class="viewcode-back" href="../reference/functions/pytest-roast.html#pytest_roast.board">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">board</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">board_session</span><span class="p">,</span> <span class="n">create_configuration</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">board</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">,</span>
+    <span class="n">host_board_session</span><span class="p">,</span>
+    <span class="n">network_board_session</span><span class="p">,</span>
+    <span class="n">systest_board_session</span><span class="p">,</span>
+    <span class="n">create_configuration</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">create_configuration</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_board</span><span class="p">(</span>
@@ -620,11 +590,23 @@
         <span class="n">base_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">create_configuration</span><span class="p">(</span>
-            <span class="n">test_name</span><span class="o">=</span><span class="n">test_name</span><span class="p">,</span> <span class="n">base_params</span><span class="o">=</span><span class="n">base_params</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">machine</span><span class="o">=</span><span class="n">machine</span>
+            <span class="n">test_name</span><span class="o">=</span><span class="n">test_name</span><span class="p">,</span>
+            <span class="n">base_params</span><span class="o">=</span><span class="n">base_params</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
+            <span class="n">machine</span><span class="o">=</span><span class="n">machine</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">sboard</span> <span class="o">=</span> <span class="n">board_session</span><span class="p">(</span><span class="n">board_type</span><span class="o">=</span><span class="n">board_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">board_type</span> <span class="o">==</span> <span class="s2">&quot;network_target&quot;</span><span class="p">:</span>
+            <span class="n">sboard</span> <span class="o">=</span> <span class="n">network_board_session</span>
+        <span class="k">elif</span> <span class="n">board_type</span> <span class="o">==</span> <span class="s2">&quot;host_target&quot;</span><span class="p">:</span>
+            <span class="n">sboard</span> <span class="o">=</span> <span class="n">host_board_session</span>
+        <span class="k">elif</span> <span class="n">board_type</span> <span class="o">==</span> <span class="s2">&quot;systest&quot;</span><span class="p">:</span>
+            <span class="n">sboard</span> <span class="o">=</span> <span class="n">systest_board_session</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Board type </span><span class="si">{</span><span class="n">board_type</span><span class="si">}</span><span class="s2"> is not supported.&quot;</span><span class="p">)</span>
         <span class="n">sboard</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="n">sboard</span><span class="o">.</span><span class="n">reboot</span> <span class="o">=</span> <span class="n">reboot</span>
         <span class="k">if</span> <span class="n">sboard</span><span class="o">.</span><span class="n">serial</span><span class="p">:</span>
@@ -637,18 +619,6 @@
         <span class="k">return</span> <span class="n">sboard</span>
 
     <span class="k">return</span> <span class="n">_board</span></div>
-
-
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">hookimpl</span><span class="p">(</span><span class="n">trylast</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">pytest_sessionfinish</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">exitstatus</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">pytest</span> <span class="kn">import</span> <span class="n">ExitCode</span>
-
-    <span class="n">no_tests_collected</span> <span class="o">=</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">NO_TESTS_COLLECTED</span>
-    <span class="n">tests_failed</span> <span class="o">=</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">TESTS_FAILED</span>
-    <span class="n">ok</span> <span class="o">=</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">OK</span>
-
-    <span class="k">if</span> <span class="n">exitstatus</span> <span class="o">==</span> <span class="n">no_tests_collected</span><span class="p">:</span>
-        <span class="n">session</span><span class="o">.</span><span class="n">exitstatus</span> <span class="o">=</span> <span class="n">ok</span>
 </pre></div>
 
            </div>
@@ -670,7 +640,7 @@
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

@@ -304,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,8 +331,8 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -397,25 +397,27 @@
            <div itemprop="articleBody">
             
   <h1>Source code for roast.component.system</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span></span><span class="c1">#</span>
+<span class="c1"># Copyright (c) 2020 Xilinx, Inc. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
 
 <div class="viewcode-block" id="SystemBase"><a class="viewcode-back" href="../../../reference/objects/systembase.html#roast.component.system.SystemBase">[docs]</a><span class="k">class</span> <span class="nc">SystemBase</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class for System component plugins</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Base class for System component plugins&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
 
 <div class="viewcode-block" id="SystemBase.configure"><a class="viewcode-back" href="../../../reference/objects/systembase.html#roast.component.system.SystemBase.configure">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Abstract class method to configure the System component</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="sd">&quot;&quot;&quot;Abstract class method to configure the System component&quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="SystemBase.build"><a class="viewcode-back" href="../../../reference/objects/systembase.html#roast.component.system.SystemBase.build">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Abstract class method to build the System component</span>
-<span class="sd">        &quot;&quot;&quot;</span></div></div>
+        <span class="sd">&quot;&quot;&quot;Abstract class method to build the System component&quot;&quot;&quot;</span></div></div>
 </pre></div>
 
            </div>
@@ -437,7 +439,7 @@
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

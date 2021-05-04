@@ -56,9 +56,7 @@
   <link rel="stylesheet" href="../../_static/css/header-footer.min.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pro.min.css" media="all" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Scenario function" href="scenario.html" />
-    <link rel="prev" title="Functions" href="index.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 	</head>
 	<body>
 		<div class="xilinx-bs3"/>
@@ -306,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,21 +329,10 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Functions</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">confParser module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scenario.html">Scenario function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="util.html">Common utilities</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pytest-roast.html">Fixtures in pytest-roast</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ssh.html">ssh module</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../objects/index.html">Objects</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -397,10 +384,6 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../index.html">API Reference</a> &raquo;</li>
-        
-          <li><a href="index.html">Functions</a> &raquo;</li>
-        
       <li>confParser module</li>
     
     
@@ -424,14 +407,14 @@
 <h1>confParser module<a class="headerlink" href="#confparser-module" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-roast.confParser"><span id="confparser"></span></span><dl class="py function">
 <dt id="roast.confParser.generate_conf">
-<code class="sig-prename descclassname">roast.confParser.</code><code class="sig-name descname">generate_conf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rootdir</span></em>, <em class="sig-param"><span class="n">test_path</span></em>, <em class="sig-param"><span class="n">test_name</span></em>, <em class="sig-param"><span class="n">base_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">overrides</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">machine</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/confParser.html#generate_conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.confParser.generate_conf" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">roast.confParser.</code><code class="sig-name descname">generate_conf</code><span class="sig-paren">(</span><em class="sig-param">rootdir=None</em>, <em class="sig-param">test_path=''</em>, <em class="sig-param">test_name=''</em>, <em class="sig-param">base_params=None</em>, <em class="sig-param">params=None</em>, <em class="sig-param">overrides=None</em>, <em class="sig-param">machine=''</em>, <em class="sig-param">interpolate_type=&lt;InterpolateEnumType.STANDARD: 0&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/confParser.html#generate_conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.confParser.generate_conf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a <code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigurationSet</span></code> from a heirarchy of configuration files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rootdir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The base directory.</p></li>
-<li><p><strong>test_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Full path of test file.</p></li>
-<li><p><strong>test_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name for the test</p></li>
+<li><p><strong>rootdir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The base directory. Defaults to None.</p></li>
+<li><p><strong>test_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Full path of test file. Defaults to empty string.</p></li>
+<li><p><strong>test_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name for the test. Defaults to empty string.</p></li>
 <li><p><strong>base_params</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Optional parameters. Defaults to None.</p></li>
 <li><p><strong>params</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Optional parameters. Defaults to None.</p></li>
 <li><p><strong>overrides</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Optional key/value pairs to override generated configuration. Defaults to None.</p></li>
@@ -449,7 +432,7 @@
 
 <dl class="py function">
 <dt id="roast.confParser.load_configuration">
-<code class="sig-prename descclassname">roast.confParser.</code><code class="sig-name descname">load_configuration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">modules</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/confParser.html#load_configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.confParser.load_configuration" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">roast.confParser.</code><code class="sig-name descname">load_configuration</code><span class="sig-paren">(</span><em class="sig-param">modules</em>, <em class="sig-param">interpolate_type=&lt;InterpolateEnumType.STANDARD: 0&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/roast/confParser.html#load_configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#roast.confParser.load_configuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function loads configuration files heirarchically. The format types accepted are:
 py, json, ini, yaml, toml</p>
 <dl class="field-list simple">
@@ -481,22 +464,13 @@ py, json, ini, yaml, toml</p>
 	  
 	  <!-- Sphinx Page Footer block -->
   
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="scenario.html" class="btn btn-neutral float-right" title="Scenario function" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
 
   <hr/>
 
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

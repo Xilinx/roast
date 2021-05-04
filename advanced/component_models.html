@@ -57,8 +57,8 @@
   <link rel="stylesheet" href="../_static/css/pro.min.css" media="all" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Usage Examples" href="examples/index.html" />
-    <link rel="prev" title="Component Plugins and Models" href="components.html" /> 
+    <link rel="next" title="Component Plugins" href="component_plugins.html" />
+    <link rel="prev" title="Advanced" href="index.html" /> 
 	</head>
 	<body>
 		<div class="xilinx-bs3"/>
@@ -306,7 +306,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -333,37 +333,22 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="configuration.html">Layered Configuration System</a></li>
-<li class="toctree-l2"><a class="reference internal" href="components.html">Component Plugins and Models</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Pytest Fixtures and Options</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#configuration-generation">Configuration Generation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#create-configuration">create_configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#get-cmdl-machine-opt">get_cmdl_machine_opt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#override-option">--override option</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Component Plugin Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testsuite">TestSuite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#system">System</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#board-acquisition">Board Acquisition</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#board-session">board_session</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#get-board">get_board</a></li>
+<li class="toctree-l2"><a class="reference internal" href="component_plugins.html">Component Plugins</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#scenario-generation">Scenario Generation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#create-scenario">create_scenario</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="examples/index.html">Usage Examples</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
 
             
 			<p class="caption"><span class="caption-text">This Page</span></p>
 				<ul class="current">
-				  <li class="toctree-l1"><a href="../_sources/user/pytest_fixtures.rst.txt"
+				  <li class="toctree-l1"><a href="../_sources/advanced/component_models.rst.txt"
 						rel="nofollow">Show Source</a></li>						
 				</ul>
           
@@ -409,15 +394,15 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="index.html">User Guide</a> &raquo;</li>
+          <li><a href="index.html">Advanced</a> &raquo;</li>
         
-      <li>Pytest Fixtures and Options</li>
+      <li>Component Plugin Models</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/user/pytest_fixtures.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/advanced/component_models.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -430,111 +415,95 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pytest-fixtures-and-options">
-<span id="pytest-fixtures"></span><h1>Pytest Fixtures and Options<a class="headerlink" href="#pytest-fixtures-and-options" title="Permalink to this headline">¶</a></h1>
-<p>While the ROAST test framework is test-tool agnostic, pytest fixtures have been provided to
-simplify test creation and execution. The fixtures provided are grouped into three categories.</p>
-<div class="contents local topic" id="contents">
-<ul class="simple">
-<li><p><a class="reference internal" href="#configuration-generation" id="id1">Configuration Generation</a></p>
-<ul>
-<li><p><a class="reference internal" href="#create-configuration" id="id2">create_configuration</a></p></li>
-<li><p><a class="reference internal" href="#get-cmdl-machine-opt" id="id3">get_cmdl_machine_opt</a></p></li>
-<li><p><a class="reference internal" href="#override-option" id="id4">--override option</a></p></li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#board-acquisition" id="id5">Board Acquisition</a></p>
-<ul>
-<li><p><a class="reference internal" href="#board-session" id="id6">board_session</a></p></li>
-<li><p><a class="reference internal" href="#get-board" id="id7">get_board</a></p></li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#scenario-generation" id="id8">Scenario Generation</a></p>
-<ul>
-<li><p><a class="reference internal" href="#create-scenario" id="id9">create_scenario</a></p></li>
-</ul>
-</li>
-</ul>
+  <div class="section" id="component-plugin-models">
+<span id="component-plugins-models"></span><h1>Component Plugin Models<a class="headerlink" href="#component-plugin-models" title="Permalink to this headline">¶</a></h1>
+<p>While there are several different methods to load code dynamically in Python, the best approach
+for ROAST is to built on top of setuptools <a class="reference external" href="https://packaging.python.org/specifications/entry-points/">entry points</a>. At a high level, the primary reasons
+are that ROAST is a Python package and we want to avoid creating custom mechanisms. Additionally,
+ROAST plugins such as the component libraries can also be packaged to extend existing ROAST
+namespaces.</p>
+<p>A plugin framework named <a class="reference external" href="https://github.com/openstack/stevedore">stevedore</a> includes the functionality needed by ROAST. Currently,
+<a class="reference external" href="https://github.com/openstack/stevedore">stevedore</a> is maintained by the Redhat Openstack project, an extremely popular cloud
+computing platform.</p>
+<p>When constructing systems, we need to establish a uniform methodology across all use cases
+so that end users can focus on test development rather than system construction. This is
+realized through the creation of plugin models that are defined to ensure an uniform API
+across all components.</p>
+<p>Currently, there are two plugin models implemented - <a class="reference internal" href="#testsuite">TestSuite</a> and <a class="reference internal" href="#system">System</a>. The abstract
+interfaces are defined as <code class="docutils literal notranslate"><span class="pre">TestSuiteBase</span></code> (roast/component/testsuite.py) and <code class="docutils literal notranslate"><span class="pre">SystemBase</span></code>
+(roast/component/system.py).</p>
+<div class="section" id="testsuite">
+<span id="id1"></span><h2>TestSuite<a class="headerlink" href="#testsuite" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+
+<span class="k">class</span> <span class="nc">TestSuiteBase</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for Test Suite component plugin</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Abstract class method to configure the TestSuite component</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Abstract class method to build the TestSuite component</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Abstract class method to deploy the TestSuite component</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Abstract class method to run the TestSuite component</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+</pre></div>
 </div>
-<p>Please review <a class="reference internal" href="examples/fixture_usage.html#pytest-fixture-usage"><span class="std std-ref">Pytest Fixture</span></a> for usage examples.</p>
-<div class="section" id="configuration-generation">
-<h2><a class="toc-backref" href="#id1">Configuration Generation</a><a class="headerlink" href="#configuration-generation" title="Permalink to this headline">¶</a></h2>
-<p>The features in this section provide functionality related to generating a test configuration.</p>
-<div class="section" id="create-configuration">
-<h3><a class="toc-backref" href="#id2">create_configuration</a><a class="headerlink" href="#create-configuration" title="Permalink to this headline">¶</a></h3>
-<p>This fixture will generate a configuration based on the location of the test file being executed.
-The optional parameters to this fixture are:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">test_name</span></code> - This specifies a test configuration to be retrieved in a subdirectory
-relative to the test file. If not provided, this will resolve to <code class="docutils literal notranslate"><span class="pre">request.node.name</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">base_params</span></code> - The list provided is written to the base_params attribute of the
-configuration.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">params</span></code> - This allows a list of test configurations to be retrieved in subdirectories
-relative to the test file. This is typically used to retrieved definitions when parameterizing
-tests.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">machine</span></code> - This specifies an override file based on the machine type where the test will be
-executed.</p></li>
-</ul>
+<p>This plugin model is designed for a component that will need to deploy other components and
+execute an application to verify correctness. Typically, there is only one TestSuite
+component for a particular test type. For example, running a validation tool to verify
+correctness on a constructed system.</p>
+<p>In this plugin model, there are four methods: <code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">build()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">deploy()</span></code>,
+and <code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code>. Each plugin that inherits from the base class will need to implement these
+methods.</p>
+</div>
+<div class="section" id="system">
+<span id="id2"></span><h2>System<a class="headerlink" href="#system" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+
+<span class="k">class</span> <span class="nc">SystemBase</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for System component plugins</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Abstract class method to configure the System component</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Abstract class method to build the System component</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>This plugin model is designed for components that make up a system. There can be one or many
+system components for a particular test type. For example, an operating system and
+programmable logic as part of a constructed system.</p>
+<p>In this plugin model, there are only two methods: <code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">build()</span></code>. Each plugin
+that inherits from the base class will need to implement these methods.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="../reference/functions/confparser.html#roast.confParser.generate_conf" title="roast.confParser.generate_conf"><code class="xref py py-func docutils literal notranslate"><span class="pre">roast.confParser.generate_conf()</span></code></a></p>
-</div>
-</div>
-<div class="section" id="get-cmdl-machine-opt">
-<h3><a class="toc-backref" href="#id3">get_cmdl_machine_opt</a><a class="headerlink" href="#get-cmdl-machine-opt" title="Permalink to this headline">¶</a></h3>
-<p>This fixture retrieves the values used when pytest is invoked with the command line option
-<code class="docutils literal notranslate"><span class="pre">--machine</span></code>.</p>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest --machine=versal,zynq
-</pre></div>
-</div>
-</div>
-<div class="section" id="override-option">
-<h3><a class="toc-backref" href="#id4">--override option</a><a class="headerlink" href="#override-option" title="Permalink to this headline">¶</a></h3>
-<p>This option when invoking pytest allows the user to specify an override file or key/value pairs
-to overwrite the configuration generated from files.</p>
-<p>Examples:</p>
-<p>To override a variable named “my_version”:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest --override=&quot;my_version=2020.1&quot;
-</pre></div>
-</div>
-<p>To override a list variable named “my_list”:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest --override=&quot;my_list=c,d&quot;
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="board-acquisition">
-<h2><a class="toc-backref" href="#id5">Board Acquisition</a><a class="headerlink" href="#board-acquisition" title="Permalink to this headline">¶</a></h2>
-<p>The fixtures in this section provide wrappers for easy board acquisition.</p>
-<div class="section" id="board-session">
-<h3><a class="toc-backref" href="#id6">board_session</a><a class="headerlink" href="#board-session" title="Permalink to this headline">¶</a></h3>
-<p>This fixture will return an instantiated <code class="docutils literal notranslate"><span class="pre">Board</span></code> object based on the <code class="docutils literal notranslate"><span class="pre">board_type</span></code> keyword
-argument. By default, <code class="docutils literal notranslate"><span class="pre">board_type=&quot;target&quot;</span></code> and will return a <code class="docutils literal notranslate"><span class="pre">TargetBoard</span></code> object. However,
-a custom <code class="docutils literal notranslate"><span class="pre">Board</span></code> class can be written and registered as a new type to be called through this
-fixture.</p>
-</div>
-<div class="section" id="get-board">
-<h3><a class="toc-backref" href="#id7">get_board</a><a class="headerlink" href="#get-board" title="Permalink to this headline">¶</a></h3>
-<p>This fixture wraps <a class="reference internal" href="#board-session">board_session</a> and attempts to retrieve the <code class="docutils literal notranslate"><span class="pre">board_interface</span></code> key
-from the configuration to be used as the <code class="docutils literal notranslate"><span class="pre">board_type</span></code>. If not found,
-<code class="docutils literal notranslate"><span class="pre">board_type=&quot;target&quot;</span></code> is used.</p>
-<p>Upon return, the <code class="docutils literal notranslate"><span class="pre">Board</span></code> object will have attributes such as:</p>
-<ul class="simple">
-<li><p>config</p></li>
-<li><p>target_console - console session with a board</p></li>
-</ul>
-<p>Additionally, the <code class="xref py py-func docutils literal notranslate"><span class="pre">start()</span></code> method will be called to initialized the board.</p>
-</div>
-</div>
-<div class="section" id="scenario-generation">
-<h2><a class="toc-backref" href="#id8">Scenario Generation</a><a class="headerlink" href="#scenario-generation" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="#create-scenario">create_scenario</a> fixture is an all-in-one wrapper for configuration generation and
-automated loading of test suites and system components of a test system.</p>
-<div class="section" id="create-scenario">
-<h3><a class="toc-backref" href="#id9">create_scenario</a><a class="headerlink" href="#create-scenario" title="Permalink to this headline">¶</a></h3>
-<p>This fixture wraps <a class="reference internal" href="#create-configuration">create_configuration</a> and calls <code class="xref py py-func docutils literal notranslate"><span class="pre">roast.component.scenario()</span></code> to return
-a <code class="docutils literal notranslate"><span class="pre">Scenario</span></code> object which contains handles to all loaded plugins (instantiated classes).</p>
+<p><a class="reference internal" href="component_plugins.html#component-plugins"><span class="std std-ref">Component Plugins</span></a></p>
 </div>
 </div>
 </div>
@@ -555,10 +524,10 @@ a <code class="docutils literal notranslate"><span class="pre">Scenario</span></
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="examples/index.html" class="btn btn-neutral float-right" title="Usage Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="component_plugins.html" class="btn btn-neutral float-right" title="Component Plugins" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="components.html" class="btn btn-neutral float-left" title="Component Plugins and Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Advanced" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -568,7 +537,7 @@ a <code class="docutils literal notranslate"><span class="pre">Scenario</span></
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

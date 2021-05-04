@@ -57,8 +57,8 @@
   <link rel="stylesheet" href="../_static/css/pro.min.css" media="all" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Component Plugins and Models" href="components.html" />
-    <link rel="prev" title="User Guide" href="index.html" /> 
+    <link rel="next" title="Getting Started" href="getting_started.html" />
+    <link rel="prev" title="Installation" href="../install/index.html" /> 
 	</head>
 	<body>
 		<div class="xilinx-bs3"/>
@@ -306,7 +306,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -333,30 +333,22 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Guide</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Layered Configuration System</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#single-file">Single File</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#template-based-heirarchical">Template-Based (Heirarchical)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dot-based-variables">Dot-Based Variables</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#python">Python</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#other-formats">Other Formats</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#accessing-configuration-values">Accessing Configuration Values</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="components.html">Component Plugins and Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Layered Configuration System</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html">Pytest Fixtures and Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/index.html">Usage Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider.html">Randomized Data Provider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex_structures.html">Complex Repository Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples_repository.html">Examples Repository</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 </ul>
 
             
 			<p class="caption"><span class="caption-text">This Page</span></p>
 				<ul class="current">
-				  <li class="toctree-l1"><a href="../_sources/user/configuration.rst.txt"
+				  <li class="toctree-l1"><a href="../_sources/tutorial/index.rst.txt"
 						rel="nofollow">Show Source</a></li>						
 				</ul>
           
@@ -402,15 +394,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="index.html">User Guide</a> &raquo;</li>
-        
-      <li>Layered Configuration System</li>
+      <li>Tutorials</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/user/configuration.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tutorial/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -423,118 +413,71 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="layered-configuration-system">
-<span id="configuration-system"></span><h1>Layered Configuration System<a class="headerlink" href="#layered-configuration-system" title="Permalink to this headline">¶</a></h1>
-<p>ROAST uses a hierarchical or layered configuration system that is based on the open source
-library <a class="reference external" href="https://github.com/tr11/python-configuration">python-configuration</a>.</p>
-<p>This allows for configuration to be defined through a single file with key/value pairs or
-through a hierarchical template-based approach. In the template-based approach, a master
-configuration is established with interpolation expressions (placeholders) to be replaced with
-the corresponding value established in another configuration file through a process called <a class="reference external" href="https://en.wikipedia.org/wiki/String_interpolation">string
-interpolation</a>.</p>
-<p>Configuration files must be named <strong>conf</strong> and can be written in a number of format types including:</p>
-<ul class="simple">
-<li><p>Python (conf.py)</p></li>
-<li><p>YAML (conf.yaml)</p></li>
-<li><p>TOML (conf.toml)</p></li>
-<li><p>JSON (conf.json)</p></li>
-<li><p>INI (conf.ini)</p></li>
+  <div class="section" id="tutorials">
+<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
+<p>The tutorials will cover various concepts ranging from basic to advanced.</p>
+<p><strong>Getting Started</strong>: This covers introductory concepts including structuring test
+repositories, generating a test configuration, pytest fixtures, and executing a test using
+pytest.</p>
+<p><strong>Layered Configuration System</strong>: This covers the configuration system in depth where layers
+of configuration can be applied to generate complex testing scenarios.</p>
+<p><strong>Pytest Fixtures and Options</strong>: This covers the pytest plugin in detail where configuration
+generation is simplified, configuration can be overriden with the command line, and boards can
+be acquired through a single interface.</p>
+<p><strong>Randomized Data Provider</strong>: This covers a parameter randomization engine where custom data can
+be specified and randomized data can be generated.</p>
+<p><strong>Complex Repository Structures</strong>: This covers how test repositories can structured to include
+parameterized and categorized test to significantly increase the complexity of test suites.</p>
+<p><strong>Examples Repository</strong>: Working examples are available to showcase how ROAST can be used
+to test applications and Linux.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#environment-setup">Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#repository-structure">Repository Structure</a></li>
 </ul>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="examples/hello_world.html#hello-world"><span class="std std-ref">Hello World</span></a> tutorial for examples of project structures.</p>
-</div>
-<div class="section" id="single-file">
-<h2>Single File<a class="headerlink" href="#single-file" title="Permalink to this headline">¶</a></h2>
-<p>In the single file approach, configuration can be defined through a file (<strong>conf.py</strong>).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">var</span> <span class="o">=</span> <span class="s2">&quot;my_string&quot;</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="template-based-heirarchical">
-<h2>Template-Based (Heirarchical)<a class="headerlink" href="#template-based-heirarchical" title="Permalink to this headline">¶</a></h2>
-<p>In the template-based approach, a variable can be defined with its value to be substituted
-with another variable’s value. The top-level configuation file (<strong>conf.py</strong>):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">var</span> <span class="o">=</span> <span class="p">{</span><span class="n">string_var</span><span class="p">}</span>
-</pre></div>
-</div>
-<p>At the test specific level, the variable and its value can be defined for a specific test
-or category of tests. The test specific configuration file (<strong>specific/conf.py</strong>):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">string_var</span> <span class="o">=</span> <span class="s2">&quot;my_string&quot;</span>
-</pre></div>
-</div>
-<p>When both files are loaded in the library, the test specific configuration file is “layered”
-on top of the template. The Python functionality behind this is <a class="reference external" href="https://docs.python.org/3.6/library/string.html#format-string-syntax">str.format</a>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>For Python configuration files, string interpolation is only supported in iterables.</p>
-</div>
-</div>
-<div class="section" id="dot-based-variables">
-<h2>Dot-Based Variables<a class="headerlink" href="#dot-based-variables" title="Permalink to this headline">¶</a></h2>
-<p>Dot-based variables can be created from configuration files.</p>
-<div class="section" id="python">
-<h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h3>
-<p>A separator of <code class="docutils literal notranslate"><span class="pre">__</span></code> is used to represent a <code class="docutils literal notranslate"><span class="pre">.</span></code>. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aa__bb__cc</span> <span class="o">=</span> <span class="mi">1</span>
-</pre></div>
-</div>
-<p>would result in the configuration</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s1">&#39;aa.bb.c&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>An alternative is to use <code class="docutils literal notranslate"><span class="pre">python-box</span></code>. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">box</span> <span class="kn">import</span> <span class="n">Box</span>
-<span class="n">aa</span> <span class="o">=</span> <span class="n">Box</span><span class="p">(</span><span class="n">default_box</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">aa</span><span class="o">.</span><span class="n">bb</span><span class="o">.</span><span class="n">cc</span> <span class="o">=</span> <span class="mi">1</span>
-
-<span class="k">del</span> <span class="n">Box</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If this method is used, the last statement of <code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">Box</span></code> should be included. Otherwise, a
-key/value pair of “Box” and a <code class="docutils literal notranslate"><span class="pre">Box</span></code> class object will appear in the configuration.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>String interpolation is only supported in iterables and not dictionaries.</p>
-</div>
-</div>
-<div class="section" id="other-formats">
-<h3>Other Formats<a class="headerlink" href="#other-formats" title="Permalink to this headline">¶</a></h3>
-<p>With other formats, if heirarchy is part of the specification, dot-based variables will
-be created. For example, a TOML configuration:</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[section]</span>
-<span class="n">var</span> <span class="o">=</span> <span class="s">&quot;mystring&quot;</span>
-</pre></div>
-</div>
-<p>would result in the configuration</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s1">&#39;section.var&#39;</span><span class="p">:</span> <span class="s1">&#39;mystring&#39;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="accessing-configuration-values">
-<h2>Accessing Configuration Values<a class="headerlink" href="#accessing-configuration-values" title="Permalink to this headline">¶</a></h2>
-<p>When creating a configuration, the <code class="docutils literal notranslate"><span class="pre">ConfigurationSet</span></code> object that is returned can be accessed
-like a dictionary. If the configuration is assigned to <code class="docutils literal notranslate"><span class="pre">conf</span></code>, the value of <code class="docutils literal notranslate"><span class="pre">var</span></code> can be
-obtained using:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">)</span>
-<span class="n">conf</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span>
-<span class="n">conf</span><span class="o">.</span><span class="n">var</span>
-</pre></div>
-</div>
-<p>Similarly, dot-based variable values can be obtained using:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;section.var&quot;</span><span class="p">)</span>
-<span class="n">conf</span><span class="p">[</span><span class="s2">&quot;section.var&quot;</span><span class="p">]</span>
-<span class="n">conf</span><span class="o">.</span><span class="n">section</span><span class="o">.</span><span class="n">var</span>
-</pre></div>
-</div>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Layered Configuration System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#single-file">Single File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#template-based-heirarchical">Template-Based (Heirarchical)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#dot-based-variables">Dot-Based Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#python">Python</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#other-formats">Other Formats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#accessing-configuration-values">Accessing Configuration Values</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pytest_fixtures.html">Pytest Fixtures and Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html#configuration-generation">Configuration Generation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#create-configuration-fixture">create_configuration fixture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#override-option">--override option</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#machine-option">--machine option</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html#board-acquisition">Board Acquisition</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#board-session-fixtures">board_session fixtures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#board-fixture">board fixture</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html#scenario-generation">Scenario Generation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#create-scenario-fixture">create_scenario fixture</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="provider.html">Randomized Data Provider</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="provider.html#randomizer-provider">Randomizer Provider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider.html#custom-providers">Custom Providers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="complex_structures.html">Complex Repository Structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="complex_structures.html#parameterized">Parameterized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex_structures.html#categorized">Categorized</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples_repository.html">Examples Repository</a></li>
+</ul>
 </div>
 </div>
 
@@ -554,10 +497,10 @@ obtained using:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="components.html" class="btn btn-neutral float-right" title="Component Plugins and Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../install/index.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -567,7 +510,7 @@ obtained using:</p>
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

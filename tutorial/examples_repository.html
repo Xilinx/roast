@@ -57,8 +57,8 @@
   <link rel="stylesheet" href="../_static/css/pro.min.css" media="all" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Pytest Fixtures and Options" href="pytest_fixtures.html" />
-    <link rel="prev" title="Layered Configuration System" href="configuration.html" /> 
+    <link rel="next" title="Advanced" href="../advanced/index.html" />
+    <link rel="prev" title="Complex Repository Structures" href="complex_structures.html" /> 
 	</head>
 	<body>
 		<div class="xilinx-bs3"/>
@@ -306,7 +306,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -333,27 +333,22 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Guide</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Layered Configuration System</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Component Plugins and Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#plugin-model">Plugin Model</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#testsuite">TestSuite</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#system">System</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html">Pytest Fixtures and Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/index.html">Usage Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider.html">Randomized Data Provider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex_structures.html">Complex Repository Structures</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Examples Repository</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 </ul>
 
             
 			<p class="caption"><span class="caption-text">This Page</span></p>
 				<ul class="current">
-				  <li class="toctree-l1"><a href="../_sources/user/components.rst.txt"
+				  <li class="toctree-l1"><a href="../_sources/tutorial/examples_repository.rst.txt"
 						rel="nofollow">Show Source</a></li>						
 				</ul>
           
@@ -399,15 +394,15 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="index.html">User Guide</a> &raquo;</li>
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
         
-      <li>Component Plugins and Models</li>
+      <li>Examples Repository</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/user/components.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tutorial/examples_repository.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -420,100 +415,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="component-plugins-and-models">
-<span id="component-plugins-models"></span><h1>Component Plugins and Models<a class="headerlink" href="#component-plugins-and-models" title="Permalink to this headline">¶</a></h1>
-<p>While there are several different methods to load code dynamically in Python, the best approach
-for ROAST is to built on top of setuptools <a class="reference external" href="https://packaging.python.org/specifications/entry-points/">entry points</a>. At a high level, the primary reasons
-are that ROAST is a Python package and we want to avoid creating custom mechanisms. Additionally,
-ROAST plugins such as the component libraries can also be packaged to extend existing ROAST
-namespaces.</p>
-<p>A plugin framework named <a class="reference external" href="https://github.com/openstack/stevedore">stevedore</a> includes the functionality needed by ROAST. Currently,
-<a class="reference external" href="https://github.com/openstack/stevedore">stevedore</a> is maintained by the Redhat Openstack project, an extremely popular cloud
-computing platform.</p>
-<div class="section" id="plugin-model">
-<h2>Plugin Model<a class="headerlink" href="#plugin-model" title="Permalink to this headline">¶</a></h2>
-<p>When constructing systems, we need to establish a uniform methodology across all use cases
-so that end users can focus on test development rather than system construction. This is
-realized through the creation of plugin models that are defined to ensure an uniform API
-across all components.</p>
-<p>Currently, there are two plugin models implemented - <a class="reference internal" href="#testsuite">TestSuite</a> and <a class="reference internal" href="#system">System</a>. The abstract
-interfaces are defined as <code class="docutils literal notranslate"><span class="pre">TestSuiteBase</span></code> (roast/component/testsuite.py) and <code class="docutils literal notranslate"><span class="pre">SystemBase</span></code>
-(roast/component/system.py).</p>
-<div class="section" id="testsuite">
-<h3>TestSuite<a class="headerlink" href="#testsuite" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
-
-
-<span class="k">class</span> <span class="nc">TestSuiteBase</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class for Test Suite component plugin</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Abstract class method to configure the TestSuite component</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Abstract class method to build the TestSuite component</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Abstract class method to deploy the TestSuite component</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Abstract class method to run the TestSuite component</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-</pre></div>
-</div>
-<p>This plugin model is designed for a component that will need to deploy other components and
-execute an application to verify correctness. Typically, there is only one TestSuite
-component for a particular test type. For example, running a validation tool to verify
-correctness on a constructed system.</p>
-<p>In this plugin model, there are four methods: <code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">build()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">deploy()</span></code>,
-and <code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code>. Each plugin that inherits from the base class will need to implement these
-methods.</p>
-</div>
-<div class="section" id="system">
-<h3>System<a class="headerlink" href="#system" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
-
-
-<span class="k">class</span> <span class="nc">SystemBase</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base class for System component plugins</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Abstract class method to configure the System component</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Abstract class method to build the System component</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-</pre></div>
-</div>
-<p>This plugin model is designed for components that make up a system. There can be one or many
-system components for a particular test type. For example, an operating system and
-programmable logic as part of a constructed system.</p>
-<p>In this plugin model, there are only two methods: <code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">build()</span></code>. Each plugin
-that inherits from the base class will need to implement these methods.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="examples/component_plugins.html#component-plugins"><span class="std std-ref">Component Plugins</span></a></p>
-</div>
-</div>
-</div>
+  <div class="section" id="examples-repository">
+<span id="id1"></span><h1>Examples Repository<a class="headerlink" href="#examples-repository" title="Permalink to this headline">¶</a></h1>
+<p>In this repository, full working examples are available to showcase various features of ROAST.
+These range from simple “hello word” applications to full Linux images.</p>
+<p>Varying styles of repository structures and test parameterization are provided to illustrate
+how test variants can be defined within a test suite.</p>
+<p>Visit <a class="reference external" href="https://github.com/Xilinx/roast-examples">https://github.com/Xilinx/roast-examples</a> for details.</p>
 </div>
 
 
@@ -532,10 +440,10 @@ that inherits from the base class will need to implement these methods.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pytest_fixtures.html" class="btn btn-neutral float-right" title="Pytest Fixtures and Options" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../advanced/index.html" class="btn btn-neutral float-right" title="Advanced" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="configuration.html" class="btn btn-neutral float-left" title="Layered Configuration System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="complex_structures.html" class="btn btn-neutral float-left" title="Complex Repository Structures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -545,7 +453,7 @@ that inherits from the base class will need to implement these methods.</p>
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

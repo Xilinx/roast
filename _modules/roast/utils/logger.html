@@ -304,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,8 +331,8 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -397,7 +397,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for roast.utils.logger</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="c1">#</span>
+<span class="c1"># Copyright (c) 2020 Xilinx, Inc. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">roast.utils</span> <span class="kn">import</span> <span class="n">mkdir</span>
@@ -408,15 +413,29 @@
     <span class="n">log_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">console_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
     <span class="n">file_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="n">console_fmt</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">file_fmt</span><span class="o">=</span><span class="p">{},</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This defines two logging handlers - file at DEBUG level and console at INFO level.</span>
-<span class="sd">    Any keyword arguments will be passed to logging.Formatter.</span>
+<span class="sd">    If any keyword arguments are provided, all other parameters will be discarded with both</span>
+<span class="sd">    handlers set to the same format.</span>
+
+<span class="sd">    The dictionaries for console_fmt and file_fmt are in the format:</span>
+<span class="sd">    {&quot;fmt&quot;: &lt;format string&gt;, &quot;datefmt&quot;: &lt;format string&gt;, &quot;style&#39;: &lt;format string&gt;}</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        log_dirname (str): Directory where log files will be written.</span>
 <span class="sd">        log_filename (str, optional): Name for log file. If not specified,</span>
 <span class="sd">            name will be generated based on timestamp. Defaults to None.</span>
+<span class="sd">        console_level (int): Logging level for console. Defaults to logging.INFO or 20.</span>
+<span class="sd">        file_level (int): Logging level for file. Default to logging.DEBUG or 10.</span>
+<span class="sd">        console_fmt (dict): Dictionary of formatting parameters.</span>
+<span class="sd">        file_fmt (dict): Dictionary of file parameters.</span>
+<span class="sd">        **fmt (str): Message format.</span>
+<span class="sd">        **datefmt (str): Date format.</span>
+<span class="sd">        **style (str): Style format.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mkdir</span><span class="p">(</span><span class="n">log_dirname</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">log_filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -430,18 +449,27 @@
     <span class="n">fh</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">file_level</span><span class="p">)</span>
     <span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
     <span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">console_level</span><span class="p">)</span>
-    
+
+    <span class="n">file_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span>
+    <span class="n">console_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">file_fmt</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="n">file_fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fmt&quot;</span><span class="p">)</span>
+        <span class="n">datefmt</span> <span class="o">=</span> <span class="n">file_fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;datefmt&quot;</span><span class="p">)</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="n">file_fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;style&quot;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span>
+        <span class="n">file_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">datefmt</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">console_fmt</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="n">console_fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fmt&quot;</span><span class="p">)</span>
+        <span class="n">datefmt</span> <span class="o">=</span> <span class="n">console_fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;datefmt&quot;</span><span class="p">)</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="n">console_fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;style&quot;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span>
+        <span class="n">console_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">datefmt</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2">.</span><span class="si">%(msecs)03d</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
-    <span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">file_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">console_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">file_formatter</span><span class="p">)</span>
+    <span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">console_formatter</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span></div>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">logger</span></div>
 
 
 <span class="k">def</span> <span class="nf">teardown_logger</span><span class="p">():</span>
@@ -470,7 +498,7 @@
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

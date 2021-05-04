@@ -304,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,8 +331,8 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -397,7 +397,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for roast.xexpect</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="c1">#</span>
+<span class="c1"># Copyright (c) 2020 Xilinx, Inc. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -409,12 +414,11 @@
 <span class="kn">import</span> <span class="nn">pexpect</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">from</span> <span class="nn">roast.ssh</span> <span class="kn">import</span> <span class="n">ssh_login_user</span><span class="p">,</span> <span class="n">ssh_login</span>
-<span class="kn">from</span> <span class="nn">roast.utils</span> <span class="kn">import</span> <span class="n">convert_list</span>
+<span class="kn">from</span> <span class="nn">roast.utils</span> <span class="kn">import</span> <span class="n">convert_list</span><span class="p">,</span> <span class="n">colorstr_to_plainstr</span>
 
 
 <div class="viewcode-block" id="Xexpect"><a class="viewcode-back" href="../../reference/objects/xexpect.html#roast.xexpect.Xexpect">[docs]</a><span class="k">class</span> <span class="nc">Xexpect</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;This Xexpect class is wrapper on pexpect</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;This Xexpect class is wrapper on pexpect&quot;&quot;&quot;</span>
 
     <span class="n">sshcmd</span> <span class="o">=</span> <span class="s2">&quot;ssh -t -y -o StrictHostKeyChecking=no -X &quot;</span>
 
@@ -471,13 +475,15 @@
         <span class="c1"># Expect for prompt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">expect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
         <span class="c1"># Search fo return code</span>
-        <span class="n">matchObj</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;returncode=([\d+])&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">before</span><span class="p">)</span>
+        <span class="n">matchObj</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;returncode=([\d]+)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">before</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">matchObj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">returncode</span> <span class="o">=</span> <span class="n">matchObj</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> exited with returncode </span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">custom_err</span>
+                <span class="k">if</span> <span class="n">custom_err</span>
+                <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> exited with returncode </span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">custom_err</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
             <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="n">err_msg</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
@@ -560,20 +566,19 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expect_async</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Xexpect.output"><a class="viewcode-back" href="../../reference/objects/xexpect.html#roast.xexpect.Xexpect.output">[docs]</a>    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the output of the previous command executed</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">before</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span></div>
+        <span class="sd">&quot;&quot;&quot;Returns the output of the previous command executed&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">colorstr_to_plainstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">before</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="Xexpect.search"><a class="viewcode-back" href="../../reference/objects/xexpect.html#roast.xexpect.Xexpect.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srch_str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Takes a regular expression as input and outputs the string that matches the regular expression.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            srch_str (str): Regular expression in braces </span>
+<span class="sd">            srch_str (str): Regular expression in braces</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: Matched string.</span>
-<span class="sd">        </span>
-<span class="sd">        Example: </span>
+
+<span class="sd">        Example:</span>
 <span class="sd">            search(&quot;([a-z][A-Z]+)&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">match_obj</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">srch_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">())</span>
@@ -609,8 +614,7 @@
 
 <div class="viewcode-block" id="Xexpect.interact"><a class="viewcode-back" href="../../reference/objects/xexpect.html#roast.xexpect.Xexpect.interact">[docs]</a>    <span class="k">def</span> <span class="nf">interact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Get Object instance</span>
-        <span class="sd">&quot;&quot;&quot;Gives control of the child process to the interactive user.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Gives control of the child process to the interactive user.&quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Interactive Console:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span></div>
 
@@ -645,6 +649,10 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">err_index</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msgs</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Timed out at </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s, while  expecting: </span><span class="si">{</span><span class="n">expected</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">if</span> <span class="n">err_msg</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
@@ -719,7 +727,7 @@
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

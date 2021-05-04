@@ -56,9 +56,7 @@
   <link rel="stylesheet" href="../../_static/css/header-footer.min.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pro.min.css" media="all" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Xsdb" href="xsdb.html" />
-    <link rel="prev" title="TestSuiteBase" href="testsuitebase.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 	</head>
 	<body>
 		<div class="xilinx-bs3"/>
@@ -306,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,24 +329,10 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../functions/index.html">Functions</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Objects</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="basebuild.html">Basebuild</a></li>
-<li class="toctree-l3"><a class="reference internal" href="board.html">Board</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scenario.html">Scenario class</a></li>
-<li class="toctree-l3"><a class="reference internal" href="serial.html">Serial</a></li>
-<li class="toctree-l3"><a class="reference internal" href="systembase.html">SystemBase</a></li>
-<li class="toctree-l3"><a class="reference internal" href="testsuitebase.html">TestSuiteBase</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Xexpect</a></li>
-<li class="toctree-l3"><a class="reference internal" href="xsdb.html">Xsdb</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -400,10 +384,6 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../index.html">API Reference</a> &raquo;</li>
-        
-          <li><a href="index.html">Objects</a> &raquo;</li>
-        
       <li>Xexpect</li>
     
     
@@ -436,7 +416,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>expected_failures</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of failure patterns or a single fail pattern string to be expected. Defaults to None.</p></li>
+<li><p><strong>expected_failures</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of failure patterns or a single fail pattern string to be expected. Defaults to None.</p></li>
 <li><p><strong>expected</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – List of patterns or a single pattern string to be expexted. Defaults to None.</p></li>
 <li><p><strong>wait_for_prompt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Specify if prompt has to be expected. Defaults to True.</p></li>
 <li><p><strong>err_index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Length of expected_failures list. Defaults to 0.</p></li>
@@ -470,7 +450,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cmd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Command to be executed on the console</p></li>
-<li><p><strong>expected_failures</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of failure patterns or a single fail pattern string to be expected. Defaults to None.</p></li>
+<li><p><strong>expected_failures</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of failure patterns or a single fail pattern string to be expected. Defaults to None.</p></li>
 <li><p><strong>expected</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – List of strings or string. Defaults to None.</p></li>
 <li><p><strong>wait_for_prompt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – To specify if prompt has to be expected after expected pattern. Defaults to True.</p></li>
 <li><p><strong>timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Waits for mentioned timeout for the expected string. Defaults to 200.</p></li>
@@ -501,7 +481,7 @@
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -576,22 +556,13 @@
 	  
 	  <!-- Sphinx Page Footer block -->
   
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="xsdb.html" class="btn btn-neutral float-right" title="Xsdb" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="testsuitebase.html" class="btn btn-neutral float-left" title="TestSuiteBase" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
 
   <hr/>
 
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

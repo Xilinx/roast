@@ -1,8 +1,8 @@
 .. _component-plugins-models:
 
-==============================
- Component Plugins and Models
-==============================
+=========================
+ Component Plugin Models
+=========================
 
 While there are several different methods to load code dynamically in Python, the best approach
 for ROAST is to built on top of setuptools `entry points`_. At a high level, the primary reasons
@@ -14,9 +14,6 @@ A plugin framework named `stevedore`_ includes the functionality needed by ROAST
 `stevedore`_ is maintained by the Redhat Openstack project, an extremely popular cloud
 computing platform.
 
-Plugin Model
-============
-
 When constructing systems, we need to establish a uniform methodology across all use cases
 so that end users can focus on test development rather than system construction. This is
 realized through the creation of plugin models that are defined to ensure an uniform API
@@ -25,6 +22,8 @@ across all components.
 Currently, there are two plugin models implemented - `TestSuite`_ and `System`_. The abstract
 interfaces are defined as ``TestSuiteBase`` (roast/component/testsuite.py) and ``SystemBase``
 (roast/component/system.py).
+
+.. _testsuite:
 
 TestSuite
 ---------
@@ -69,6 +68,8 @@ correctness on a constructed system.
 In this plugin model, there are four methods: :func:`configure`, :func:`build`, :func:`deploy`,
 and :func:`run`. Each plugin that inherits from the base class will need to implement these
 methods.
+
+.. _system:
 
 System
 ------

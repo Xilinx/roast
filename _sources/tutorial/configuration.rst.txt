@@ -23,7 +23,7 @@ Configuration files must be named **conf** and can be written in a number of for
 
 .. seealso::
 
-   :ref:`hello-world` tutorial for examples of project structures.
+   :ref:`getting-started` tutorial for examples of project structures.
 
 Single File
 ===========

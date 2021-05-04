@@ -56,9 +56,7 @@
   <link rel="stylesheet" href="../../_static/css/header-footer.min.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pro.min.css" media="all" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="ssh module" href="ssh.html" />
-    <link rel="prev" title="Common utilities" href="util.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 	</head>
 	<body>
 		<div class="xilinx-bs3"/>
@@ -306,7 +304,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -331,21 +329,10 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Functions</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="confparser.html">confParser module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scenario.html">Scenario function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="util.html">Common utilities</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Fixtures in pytest-roast</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ssh.html">ssh module</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../objects/index.html">Objects</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -397,10 +384,6 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../index.html">API Reference</a> &raquo;</li>
-        
-          <li><a href="index.html">Functions</a> &raquo;</li>
-        
       <li>Fixtures in pytest-roast</li>
     
     
@@ -428,28 +411,18 @@
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="pytest_roast.get_cmdl_machine_opt">
-<code class="sig-prename descclassname">pytest_roast.</code><code class="sig-name descname">get_cmdl_machine_opt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pytest_roast.html#get_cmdl_machine_opt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytest_roast.get_cmdl_machine_opt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt id="pytest_roast.create_scenario">
 <code class="sig-prename descclassname">pytest_roast.</code><code class="sig-name descname">create_scenario</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">create_configuration</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pytest_roast.html#create_scenario"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytest_roast.create_scenario" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="pytest_roast.board_session">
-<code class="sig-prename descclassname">pytest_roast.</code><code class="sig-name descname">board_session</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pytest_roast.html#board_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytest_roast.board_session" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt id="pytest_roast.get_board">
-<code class="sig-prename descclassname">pytest_roast.</code><code class="sig-name descname">get_board</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">board_session</span></em>, <em class="sig-param"><span class="n">create_configuration</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pytest_roast.html#get_board"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytest_roast.get_board" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pytest_roast.</code><code class="sig-name descname">get_board</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">host_board_session</span></em>, <em class="sig-param"><span class="n">network_board_session</span></em>, <em class="sig-param"><span class="n">systest_board_session</span></em>, <em class="sig-param"><span class="n">create_configuration</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pytest_roast.html#get_board"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytest_roast.get_board" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="pytest_roast.board">
-<code class="sig-prename descclassname">pytest_roast.</code><code class="sig-name descname">board</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">board_session</span></em>, <em class="sig-param"><span class="n">create_configuration</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pytest_roast.html#board"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytest_roast.board" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pytest_roast.</code><code class="sig-name descname">board</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">host_board_session</span></em>, <em class="sig-param"><span class="n">network_board_session</span></em>, <em class="sig-param"><span class="n">systest_board_session</span></em>, <em class="sig-param"><span class="n">create_configuration</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pytest_roast.html#board"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytest_roast.board" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -468,22 +441,13 @@
 	  
 	  <!-- Sphinx Page Footer block -->
   
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="ssh.html" class="btn btn-neutral float-right" title="ssh module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="util.html" class="btn btn-neutral float-left" title="Common utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
 
   <hr/>
 
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

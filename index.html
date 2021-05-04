@@ -305,7 +305,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -332,8 +332,8 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="install/index.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user/index.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 </ul>
 
             
@@ -406,73 +406,86 @@
             
   <div class="section" id="roast-randomized-okaying-across-system-topologies">
 <h1>ROAST – Randomized Okaying Across System Topologies<a class="headerlink" href="#roast-randomized-okaying-across-system-topologies" title="Permalink to this headline">¶</a></h1>
-<p>ROAST, a unified framework for component testing across system topologies addresses the challenges
-of testing a complex heterogenous adaptive computer acceleration platform (ACAP) against a wide
-range of scenarios, finding edge cases that would not have been usually covered with traditional
-testing methods. ROAST includes a modular plugin architecture built on Python for extensibility
-and scalability in building components, launching tests, and collecting results.</p>
+<p>ROAST is an open-source Python framework that simplifies the development of complex validation
+test suites. To accomplish this, ROAST provides a collection of interfaces that allows test
+developers to build test suites in a highly structured manner.</p>
+<p>Key features:</p>
+<ul class="simple">
+<li><p>Compose systems from Xilinx or custom components</p></li>
+<li><p>Define systems composed from various configuration sources</p></li>
+<li><p>Heirarchical configuration system</p></li>
+<li><p>Randomized data provider for randomized testing</p></li>
+<li><p>Generic APIs for simplified usage and access</p></li>
+<li><p>Plugin system for extensibility</p></li>
+</ul>
+<p>ROAST consists of three packages:</p>
+<ul class="simple">
+<li><p><strong>roast</strong>: Core functionality that includes interfaces, plugin framework, configuration
+management, and more</p></li>
+<li><p><strong>roast-xilinx (recommended)</strong>: plugin for roast that includes Xilinx specific functionality such as
+board acquisition, PetaLinux building, Vitis wrapper, and more.</p></li>
+<li><p><strong>pytest-roast (optional)</strong>: plugin for pytest that includes pytest fixtures for accelerated test
+development when using pytest as a test runner. Features includes board automation, scenario
+generation, and configuration generation.</p></li>
+</ul>
+<p>Example test flow with package breakdown:</p>
+<img alt="_images/roast_packages.png" src="_images/roast_packages.png" />
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install/index.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install/index.html#python-versions">Python Versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install/index.html#versions">Versions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install/index.html#basic-installation">Basic Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user/index.html">User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="user/configuration.html">Layered Configuration System</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user/configuration.html#single-file">Single File</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user/configuration.html#template-based-heirarchical">Template-Based (Heirarchical)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user/configuration.html#dot-based-variables">Dot-Based Variables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user/configuration.html#accessing-configuration-values">Accessing Configuration Values</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting_started.html">Getting Started</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/getting_started.html#environment-setup">Environment Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/getting_started.html#repository-structure">Repository Structure</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="user/components.html">Component Plugins and Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user/components.html#plugin-model">Plugin Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/configuration.html">Layered Configuration System</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/configuration.html#single-file">Single File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/configuration.html#template-based-heirarchical">Template-Based (Heirarchical)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/configuration.html#dot-based-variables">Dot-Based Variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/configuration.html#accessing-configuration-values">Accessing Configuration Values</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="user/pytest_fixtures.html">Pytest Fixtures and Options</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user/pytest_fixtures.html#configuration-generation">Configuration Generation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user/pytest_fixtures.html#board-acquisition">Board Acquisition</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user/pytest_fixtures.html#scenario-generation">Scenario Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/pytest_fixtures.html">Pytest Fixtures and Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/pytest_fixtures.html#configuration-generation">Configuration Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/pytest_fixtures.html#board-acquisition">Board Acquisition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/pytest_fixtures.html#scenario-generation">Scenario Generation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="user/examples/index.html">Usage Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user/examples/hello_world.html">Hello World</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user/examples/fixture_usage.html">Pytest Fixture</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user/examples/component_plugins.html">Component Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/provider.html">Randomized Data Provider</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/provider.html#randomizer-provider">Randomizer Provider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/provider.html#custom-providers">Custom Providers</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/complex_structures.html">Complex Repository Structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/complex_structures.html#parameterized">Parameterized</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/complex_structures.html#categorized">Categorized</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="reference/index.html">API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference/functions/index.html">Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="reference/functions/confparser.html">confParser module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/functions/scenario.html">Scenario function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/functions/util.html">Common utilities</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/functions/pytest-roast.html">Fixtures in pytest-roast</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/functions/ssh.html">ssh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/examples_repository.html">Examples Repository</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="reference/objects/index.html">Objects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="reference/objects/basebuild.html">Basebuild</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/objects/board.html">Board</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/objects/scenario.html">Scenario class</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/objects/serial.html">Serial</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/objects/systembase.html">SystemBase</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/objects/testsuitebase.html">TestSuiteBase</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/objects/xexpect.html">Xexpect</a></li>
-<li class="toctree-l3"><a class="reference internal" href="reference/objects/xsdb.html">Xsdb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced/component_models.html">Component Plugin Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="advanced/component_models.html#testsuite">TestSuite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="advanced/component_models.html#system">System</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/component_plugins.html">Component Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="advanced/component_plugins.html#creating-plugins">Creating Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="advanced/component_plugins.html#loading-plugins">Loading Plugins</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </div>
-<div class="section" id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-</ul>
 </div>
 </div>
 
@@ -503,7 +516,7 @@ and scalability in building components, launching tests, and collecting results.
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>

@@ -57,8 +57,7 @@
   <link rel="stylesheet" href="../_static/css/pro.min.css" media="all" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Layered Configuration System" href="configuration.html" />
-    <link rel="prev" title="Installation" href="../install/index.html" /> 
+    <link rel="prev" title="Component Plugin Models" href="component_models.html" /> 
 	</head>
 	<body>
 		<div class="xilinx-bs3"/>
@@ -306,7 +305,7 @@
             
             
               <div class="version">
-                1.0
+                2.1
               </div>
             
           
@@ -333,20 +332,22 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html">Layered Configuration System</a></li>
-<li class="toctree-l2"><a class="reference internal" href="components.html">Component Plugins and Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html">Pytest Fixtures and Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/index.html">Usage Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="component_models.html">Component Plugin Models</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Component Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-plugins">Creating Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-plugins">Loading Plugins</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+</li>
 </ul>
 
             
 			<p class="caption"><span class="caption-text">This Page</span></p>
 				<ul class="current">
-				  <li class="toctree-l1"><a href="../_sources/user/index.rst.txt"
+				  <li class="toctree-l1"><a href="../_sources/advanced/component_plugins.rst.txt"
 						rel="nofollow">Show Source</a></li>						
 				</ul>
           
@@ -392,13 +393,15 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>User Guide</li>
+          <li><a href="index.html">Advanced</a> &raquo;</li>
+        
+      <li>Component Plugins</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/user/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/advanced/component_plugins.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -411,65 +414,201 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="user-guide">
-<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Layered Configuration System</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#single-file">Single File</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#template-based-heirarchical">Template-Based (Heirarchical)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#dot-based-variables">Dot-Based Variables</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="configuration.html#python">Python</a></li>
-<li class="toctree-l3"><a class="reference internal" href="configuration.html#other-formats">Other Formats</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#accessing-configuration-values">Accessing Configuration Values</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="components.html">Component Plugins and Models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="components.html#plugin-model">Plugin Model</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="components.html#testsuite">TestSuite</a></li>
-<li class="toctree-l3"><a class="reference internal" href="components.html#system">System</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pytest_fixtures.html">Pytest Fixtures and Options</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html#configuration-generation">Configuration Generation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#create-configuration">create_configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#get-cmdl-machine-opt">get_cmdl_machine_opt</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#override-option">--override option</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html#board-acquisition">Board Acquisition</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#board-session">board_session</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#get-board">get_board</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pytest_fixtures.html#scenario-generation">Scenario Generation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pytest_fixtures.html#create-scenario">create_scenario</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Usage Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/hello_world.html">Hello World</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/hello_world.html#environment-setup">Environment Setup</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/hello_world.html#repository-structure">Repository Structure</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="examples/fixture_usage.html">Pytest Fixture</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/fixture_usage.html#parameterize-with-machine-option">Parameterize with machine option</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="examples/component_plugins.html">Component Plugins</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/component_plugins.html#creating-plugins">Creating Plugins</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/component_plugins.html#loading-plugins">Loading Plugins</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+  <div class="section" id="component-plugins">
+<span id="id1"></span><h1>Component Plugins<a class="headerlink" href="#component-plugins" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we will discuss how to create and load component plugins. If you’re not familiar
+with the component models, please first visit <a class="reference internal" href="component_models.html#component-plugins-models"><span class="std std-ref">Component Plugin Models</span></a> for details.</p>
+<div class="section" id="creating-plugins">
+<h2>Creating Plugins<a class="headerlink" href="#creating-plugins" title="Permalink to this headline">¶</a></h2>
+<p>Steps to creating a component plugin:</p>
+<ol class="arabic simple">
+<li><p>With the two possible plugin models, <code class="docutils literal notranslate"><span class="pre">TestSuiteBase</span></code> or <code class="docutils literal notranslate"><span class="pre">SystemBase</span></code>, choose the model that
+fits for your component plugin.</p></li>
+<li><p>Subclass the base class and implement the required methods.</p></li>
+<li><p>Define the name of the plugin and extend one of two possible roast component namespaces.</p></li>
+</ol>
+<p>Let’s start with a system component named <code class="docutils literal notranslate"><span class="pre">MySystem</span></code> that has two methods, <code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code>
+and <code class="xref py py-func docutils literal notranslate"><span class="pre">build()</span></code>. This will be created in <strong>my_system.py</strong>.</p>
+<p>Create a test suite component named <code class="docutils literal notranslate"><span class="pre">MyTestSuite</span></code> that has four methods, <code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code>,
+<code class="xref py py-func docutils literal notranslate"><span class="pre">build()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">deploy()</span></code>, and <code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code>. This will be create in <strong>my_testsuite.py</strong>.</p>
+<p>We will need a configuration file named <strong>conf.py</strong> to define which components will be used in
+the test scenario and a test module named <strong>test_scenario.py</strong>. Add these into the <strong>tests</strong> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>repository/
+└── tests/
+    ├── conf.py
+    ├── my_system.py
+    ├── my_testsuite.py
+    └── test_scenario.py
+</pre></div>
+</div>
+<p>conf.py</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">roast</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my_system&quot;</span><span class="p">],</span> <span class="s2">&quot;testsuite&quot;</span><span class="p">:</span> <span class="s2">&quot;my_testsuite&quot;</span><span class="p">}</span>
+<span class="n">var</span> <span class="o">=</span> <span class="s2">&quot;hello world&quot;</span>
+</pre></div>
+</div>
+<p>Here, we define a system component named <code class="docutils literal notranslate"><span class="pre">&quot;my_system&quot;</span></code> and a testsuite component named
+<code class="docutils literal notranslate"><span class="pre">&quot;my_testsuite&quot;</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These names are identifiers used by each plugin when registering as an entry point and do not
+need to match the module filename.</p>
+<p>Also note that the value for <code class="docutils literal notranslate"><span class="pre">system</span></code> is a list since a test scenario could have more than
+one.</p>
+</div>
+<p>my_system.py</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">roast.component.system</span> <span class="kn">import</span> <span class="n">SystemBase</span>
+
+<span class="k">class</span> <span class="nc">MySystem</span><span class="p">(</span><span class="n">SystemBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MySystem configure called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;MySystem build called&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">custom_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;MySystem custom method called with </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span>
+</pre></div>
+</div>
+<p>Here, we are subclassing from the <code class="docutils literal notranslate"><span class="pre">SystemBase</span></code> abstract base class and implementing the required
+methods <code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">build()</span></code>. In addition, we are going to extend the class with
+a method named <code class="xref py py-func docutils literal notranslate"><span class="pre">custom_method()</span></code>.</p>
+<p>The <code class="xref py py-func docutils literal notranslate"><span class="pre">super()</span></code> call in <code class="xref py py-func docutils literal notranslate"><span class="pre">__init__()</span></code> is where the configuration is stored as an
+attribute of the class and can accessed through <code class="docutils literal notranslate"><span class="pre">self.config</span></code>.</p>
+<p>my_testsuite.py</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">roast.component.testsuite</span> <span class="kn">import</span> <span class="n">TestSuiteBase</span>
+
+<span class="k">class</span> <span class="nc">MyTestSuite</span><span class="p">(</span><span class="n">TestSuiteBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MyTestSuite configure called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;MyTestSuite build called&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MyTestSuite deploy called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;MyTestSuite run called&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">custom_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;MyTestSuite custom method called with </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span>
+</pre></div>
+</div>
+<p>Similar to <code class="docutils literal notranslate"><span class="pre">MySystem</span></code>, subclass and implement the required methods. Also extend the class with
+a custom method.</p>
+</div>
+<div class="section" id="loading-plugins">
+<h2>Loading Plugins<a class="headerlink" href="#loading-plugins" title="Permalink to this headline">¶</a></h2>
+<p>In order to dynamically load component plugins, they first need to be registered in the ROAST
+namespace as an object that can be called through entry points. Two namespaces are available:
+<code class="docutils literal notranslate"><span class="pre">roast.component.testsuite</span></code> for a TestSuite component and <code class="docutils literal notranslate"><span class="pre">roast.component.system</span></code> for System
+components.</p>
+<p>test_scenario.py</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">roast.utils</span> <span class="kn">import</span> <span class="n">register_plugin</span>
+<span class="kn">import</span> <span class="nn">my_system</span><span class="o">,</span> <span class="nn">my_testsuite</span>
+
+<span class="k">def</span> <span class="nf">test_my_scenario</span><span class="p">(</span><span class="n">create_scenario</span><span class="p">):</span>
+    <span class="n">system_name</span> <span class="o">=</span> <span class="s2">&quot;my_system&quot;</span>
+    <span class="n">system_location</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsourcefile</span><span class="p">(</span><span class="n">my_system</span><span class="p">)</span>
+    <span class="n">register_plugin</span><span class="p">(</span>
+        <span class="n">system_location</span><span class="p">,</span> <span class="n">system_name</span><span class="p">,</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;my_system:MySystem&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">testsuite_name</span> <span class="o">=</span> <span class="s2">&quot;my_testsuite&quot;</span>
+    <span class="n">testsuite_location</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsourcefile</span><span class="p">(</span><span class="n">my_testsuite</span><span class="p">)</span>
+    <span class="n">register_plugin</span><span class="p">(</span>
+        <span class="n">testsuite_location</span><span class="p">,</span> <span class="n">testsuite_name</span><span class="p">,</span> <span class="s2">&quot;testsuite&quot;</span><span class="p">,</span> <span class="s2">&quot;my_testsuite:MyTestSuite&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">scn</span> <span class="o">=</span> <span class="n">create_scenario</span><span class="p">()</span>
+    <span class="n">my_ts</span> <span class="o">=</span> <span class="n">scn</span><span class="o">.</span><span class="n">ts</span>
+    <span class="n">my_sys</span> <span class="o">=</span> <span class="n">scn</span><span class="o">.</span><span class="n">sys</span><span class="p">(</span><span class="n">system_name</span><span class="p">)</span>
+
+    <span class="n">scn</span><span class="o">.</span><span class="n">configure_component</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">my_ts</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">var</span> <span class="o">==</span> <span class="s2">&quot;hello world&quot;</span>
+    <span class="k">assert</span> <span class="n">my_sys</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">var</span> <span class="o">==</span> <span class="s2">&quot;hello world&quot;</span>
+
+    <span class="n">build_results</span> <span class="o">=</span> <span class="n">scn</span><span class="o">.</span><span class="n">build_component</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">build_results</span><span class="p">[</span><span class="n">testsuite_name</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;MyTestSuite build called&quot;</span>
+    <span class="k">assert</span> <span class="n">build_results</span><span class="p">[</span><span class="n">system_name</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;MySystem build called&quot;</span>
+
+    <span class="n">scn</span><span class="o">.</span><span class="n">deploy_component</span><span class="p">()</span>
+
+    <span class="n">run_results</span> <span class="o">=</span> <span class="n">scn</span><span class="o">.</span><span class="n">run_component</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">run_results</span><span class="p">[</span><span class="n">testsuite_name</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;MyTestSuite run called&quot;</span>
+
+    <span class="n">custom_result</span> <span class="o">=</span> <span class="n">my_ts</span><span class="o">.</span><span class="n">custom_method</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">custom_result</span> <span class="o">==</span> <span class="s2">&quot;MyTestSuite custom method called with hello&quot;</span>
+    <span class="n">custom_result</span> <span class="o">=</span> <span class="n">my_sys</span><span class="o">.</span><span class="n">custom_method</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">custom_result</span> <span class="o">==</span> <span class="s2">&quot;MySystem custom method called with hello&quot;</span>
+</pre></div>
+</div>
+<p>Here, we need to first register the <code class="docutils literal notranslate"><span class="pre">MySystem</span></code> and <code class="docutils literal notranslate"><span class="pre">MyTestSuite</span></code> classes. In order to register,
+we will need their file locations which can be hard coded or obtained through the use of
+<code class="xref py py-func docutils literal notranslate"><span class="pre">inspect.getfile()</span></code>.</p>
+<p>If the component objects will be packaged into a Python package, this can be defined in
+<strong>setup.py</strong>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">entry_points</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">&quot;roast.component.system&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;repository.tests.my_system = my_system:MySystem&quot;</span><span class="p">,],</span>
+    <span class="s2">&quot;roast.component.testsuite&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;repository.test.my_testsuite = my_testsuite:MyTestSuite&quot;</span><span class="p">,],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Next, we call the <code class="xref py py-func docutils literal notranslate"><span class="pre">create_scenario()</span></code> fixture to load the components and also generate a
+configuration. The variable <code class="docutils literal notranslate"><span class="pre">scn</span></code> holds references to both <code class="docutils literal notranslate"><span class="pre">MySystem</span></code> and <code class="docutils literal notranslate"><span class="pre">MyTestSuite</span></code>
+instances. To access the specific instance, use <code class="docutils literal notranslate"><span class="pre">scn.ts</span></code> for test suite or <code class="docutils literal notranslate"><span class="pre">scn.sys</span></code>
+for systems. For systems, the specific name is required since there can be more than one system
+component. Here, we’re going to assign the instances to <code class="docutils literal notranslate"><span class="pre">my_ts</span></code> and <code class="docutils literal notranslate"><span class="pre">my_sys</span></code>.</p>
+<p>Calling the <code class="xref py py-func docutils literal notranslate"><span class="pre">configure_component()</span></code> method will in turn call the <code class="xref py py-func docutils literal notranslate"><span class="pre">configure()</span></code> method
+in every loaded instance. In both <code class="docutils literal notranslate"><span class="pre">MySystem</span></code> and <code class="docutils literal notranslate"><span class="pre">MyTestSuite</span></code>, the configuration is stored as
+a <code class="docutils literal notranslate"><span class="pre">config</span></code> attribute. With <code class="docutils literal notranslate"><span class="pre">my_ts.config.var</span></code>, we can access the value of <code class="docutils literal notranslate"><span class="pre">var</span></code> in the
+<code class="docutils literal notranslate"><span class="pre">MyTestSuite</span></code> instance and similarly with <code class="docutils literal notranslate"><span class="pre">my_sys.config.var</span></code> for <code class="docutils literal notranslate"><span class="pre">MySystem</span></code>. Both should
+return <code class="docutils literal notranslate"><span class="pre">&quot;hello</span> <span class="pre">world&quot;</span></code>.</p>
+<p>Similarly, when <code class="xref py py-func docutils literal notranslate"><span class="pre">build_component()</span></code> is called, this will call <code class="xref py py-func docutils literal notranslate"><span class="pre">build()</span></code> in each
+instance. The difference here is that values are returned in a dictionary that can be accessed
+using the name as the key.</p>
+<p>The methods <code class="xref py py-func docutils literal notranslate"><span class="pre">deploy_component()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">run_component()</span></code> are essentially the same as
+the previous two except that these call <strong>only</strong> the <code class="docutils literal notranslate"><span class="pre">MyTestSuite</span></code> instance since systems do not
+have <code class="xref py py-func docutils literal notranslate"><span class="pre">deploy()</span></code> or <code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code> methods.</p>
+<p>Lastly, since we access to the instances, we can call custom methods, pass parameters, and also
+return values.</p>
+<p>Let’s now execute the tests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest -rP
+=========== test session starts ===========
+..
+collected 1 item
+
+tests/test_scenario .                [100%]
+
+===========================================
+---------- Captured stdout call -----------
+MySystem configure called
+MyTestSuite configure called
+MySystem build called
+MyTestSuite build called
+MyTestSuite deploy called
+MyTestSuite run called
+MyTestSuite custom method called with hello
+MySystem custom method called with hello
+============ 1 passed in 0.12s ============
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -489,10 +628,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="configuration.html" class="btn btn-neutral float-right" title="Layered Configuration System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="../install/index.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="component_models.html" class="btn btn-neutral float-left" title="Component Plugin Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -502,7 +639,7 @@
   <div role="contentinfo" class="copyright">
     <p class="footerinfo">
       <span class="lastupdated">
-        Last updated on September 30, 2020.
+        Last updated on April 29, 2021.
       </span>
 
     </p>
