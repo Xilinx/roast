@@ -55,7 +55,7 @@ def scp_file_transfer(
     scp_base_cmd = (
         f"""scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r """
     )
-    proxy_flag = f'-o "ProxyCommand ssh {proxy_server} -W %h:%p" '
+    proxy_flag = f'-o "ProxyCommand ssh {proxy_server} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p" '
     cmd = f"{scp_base_cmd} {proxy_flag} "
 
     # Send the file

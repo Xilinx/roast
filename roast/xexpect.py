@@ -149,6 +149,7 @@ class Xexpect:
         expected: Optional[List[str]] = None,
         timeout: int = 200,
         err_msg: Optional[str] = None,
+        expected_failures: Union[None, List[str], str] = None,
     ) -> None:
         """Sends list of commands to the console and expects the specified string.
 
@@ -157,10 +158,17 @@ class Xexpect:
             expected: Expects for the same string for all the commands. If nothing is specified it expects for prompt. Defaults to None.
             timeout: Waits for mentioned timeout for the expected string. Defaults to 200.
             err_msg: Optional custom error message. Defaults to None.
+            expected_failures: List of failure patterns or a single fail pattern string to be expected. Defaults to None.
         """
 
         for cmd in cmd_list:
-            self.runcmd(cmd, expected=expected, timeout=timeout, err_msg=err_msg)
+            self.runcmd(
+                cmd,
+                expected_failures=expected_failures,
+                expected=expected,
+                timeout=timeout,
+                err_msg=err_msg,
+            )
 
     def runcmd_async(self, cmd, expected=None, timeout=200):
         self.sendline(cmd)
