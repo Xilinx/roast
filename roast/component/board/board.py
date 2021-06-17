@@ -53,10 +53,9 @@ class BoardBase(metaclass=ABCMeta):
         self.host = self.config.get("remote_host", socket.gethostname())
 
     def _get_target_ip(self) -> None:
-        if not self.target_ip:
-            self.serial.sendline("ifconfig eth0")
-            self.serial.expect("# ")
-            self.target_ip = self.serial.search("(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
+        self.serial.sendline("ifconfig eth0")
+        self.serial.expect("# ")
+        self.target_ip = self.serial.search("(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
 
 
 class Board:

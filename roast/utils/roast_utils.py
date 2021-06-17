@@ -22,6 +22,7 @@ import subprocess
 import atexit
 from pathlib import Path
 from distutils.dir_util import copy_tree
+from git.exc import GitCommandError, InvalidGitRepositoryError
 
 from typing import Any, List, Optional, Dict
 from warnings import warn
@@ -174,7 +175,7 @@ class Git:
             _, git_tag, _ = self.run_gitcmd(
                 f"git describe --exact-match {git_commit}", True
             )
-        except git.exc.GitCommandError:
+        except GitCommandError:
             git_tag = None
         out += f"Repo at branch: {git_branch} commit: {git_commit} tag: {git_tag}\n"
         out += f"Requested branch: {branch} commit: {commit} tag: {tag}\n"
@@ -300,7 +301,7 @@ def is_git_repo(repo_path):
     try:
         _ = git.Repo(repo_path).git_dir
         return True
-    except git.exc.InvalidGitRepositoryError:
+    except InvalidGitRepositoryError:
         return False
 
 
@@ -360,7 +361,7 @@ def print_msg(msg: str) -> None:
         msg: Message to be print.
     """
     try:
-        rows, columns = os.popen("stty size", "r").read().split()
+        _, columns = os.popen("stty size", "r").read().split()
         print(str(msg).center(int(columns), "*"))
     except:
         print(str(msg))
@@ -668,7 +669,7 @@ def is_error(stderr_msg: str) -> bool:
 
 
 def detailed_error():
-    exc_type, exc_obj, exc_tb = sys.exc_info()
+    exc_type, _, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print(exc_type, fname, exc_tb.tb_lineno)
 
@@ -773,11 +774,11 @@ class LoadFromFile(argparse.Action):
             data = yaml.safe_load(contents)
 
             # Set the arguments after reading from the file. It will stop reading after one correct read
-            for k, v in data.items():
+            for _, v in data.items():
                 for nk, nv in v.items():
                     setattr(namespace, nk, nv)
                 break
-        except Exception as e:
+        except Exception:
             detailed_error()
 
 
@@ -936,7 +937,7 @@ def git_clone(
             repo.git.checkout(rev)
         print(f"Info: {repo_url} Cloned successfully")
         return True
-    except Exception as e:
+    except Exception:
         print(f"Error: Failed to clone {repo_url}")
         raise Exception(f"Error: Failed to clone {repo_url}")
 
@@ -1364,7 +1365,7 @@ def get_config_data(config, key, temp=None):
 
 def is_filesystem_nfs(dir_path):
     cmd = f"df -P -T {dir_path} | tail -n +2 | awk '{{print $2}}'"
-    filesystem, returncode = check_output(cmd)
+    filesystem, _ = check_output(cmd)
     if filesystem.strip() == "nfs":
         return True
     else:
@@ -1401,6 +1402,7 @@ class FileAdapter:
     def __init__(self, logger):
         self.logger = logger
         self._data = ""
+        self.ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
         atexit.register(self.exit)
 
     def write(self, data):
@@ -1408,8 +1410,9 @@ class FileAdapter:
         self._data += data
         lines = re.findall(".*\n", self._data, re.M)  # find lines
         for line in lines:
-            self.logger.debug(line.strip())
             self._data = self._data.replace(line, "")
+            line = self.ansi_escape.sub("", line)
+            self.logger.debug(line.strip())
 
     def flush(self):
         pass  # leave it to logging to flush properly
