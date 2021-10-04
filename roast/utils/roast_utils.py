@@ -23,6 +23,7 @@ import atexit
 from pathlib import Path
 from distutils.dir_util import copy_tree
 from git.exc import GitCommandError, InvalidGitRepositoryError
+from roast.exceptions import DirectoryNotFoundError, GitError
 
 from typing import Any, List, Optional, Dict
 from warnings import warn
@@ -41,15 +42,6 @@ class Git:
         self.rev = git_params.get("rev")
         self.repo_path = repo_path
         self.clone_once = clone_once
-        log.info("******************************************************")
-        log.info(f"repo_url : {self.repo_url}")
-        log.info(f"branch : {self.branch}")
-        log.info(f"sparse_path : {self.sparse_path}")
-        log.info(f"patches : {self.patches}")
-        log.info(f"patchesDir : {self.patchesDir}")
-        log.info(f"rev : {self.rev}")
-        log.info(f"repo_path : {self.repo_path}")
-        log.info("******************************************************")
 
     def clone(self, **kwargs):
         self.repo_name = get_base_name(self.repo_path)
@@ -66,6 +58,15 @@ class Git:
     def _clone(self, **kwargs):
 
         log.info(f"Cloning {self.repo_url}")
+        log.info("******************************************************")
+        log.info(f"repo_url : {self.repo_url}")
+        log.info(f"branch : {self.branch}")
+        log.info(f"sparse_path : {self.sparse_path}")
+        log.info(f"patches : {self.patches}")
+        log.info(f"patchesDir : {self.patchesDir}")
+        log.info(f"rev : {self.rev}")
+        log.info(f"repo_path : {self.repo_path}")
+        log.info("******************************************************")
         no_checkout = True if len(self.sparse_path) else False
         git.Repo.clone_from(
             self.repo_url,
@@ -96,6 +97,7 @@ class Git:
 
     def apply_patch(self, workDir):
 
+        self.repo = git.Repo(self.repo_path)
         patches = []
         if self.patches and is_dir(f"{workDir}/patches"):
             patches = [
@@ -109,7 +111,10 @@ class Git:
             patches.extend(external_patches)
 
         for patch in patches:
-            if is_file(patch):
+            patch_file_name = get_base_name(patch)
+
+            # Exclude coverletter patches if present.
+            if is_file(patch) and not patch_file_name.startswith("0000-"):
                 self.repo.git.am(["-3", patch])
 
     def clean(self):
@@ -226,8 +231,8 @@ class Git:
             self.repo = git.Repo(self.repo_path)
             # repo_url = self.repo.git.remote("get-url", "origin")
             # FIXME due to git version not supporting the command (Required git version 2.23.0)
-            repo_url = self.repo.git.config("--get", "remote.origin.url")
             remote = self.repo.git.remote()
+            repo_url = self.repo.git.config("--get", f"remote.{remote}.url")
             repo_current_branch = self.repo.git.rev_parse(["--abbrev-ref", "HEAD"])
             self.local_commits = ""
             self.origin_commit = ""
@@ -519,7 +524,7 @@ def is_file(filepath: str, silent_discard: bool = True) -> bool:
         filepath: File Path.
 
     Raises:
-        OSError: Raises OSError exception if file not found.
+        FileNotFoundError: Raises exception if file not found.
 
     Returns:
         bool: True, if file is found Or False, if file is not found.
@@ -529,34 +534,37 @@ def is_file(filepath: str, silent_discard: bool = True) -> bool:
         if os.path.isfile(filepath):
             return True
         else:
-            raise OSError
+            raise Exception
     except:
         if not silent_discard:
-            print("%s No such file exists" % filepath)
+            err_msg = f"No such file exists: {filepath}"
+            log.exception(err_msg)
+            raise FileNotFoundError(err_msg) from None
         return False
 
 
 def is_dir(dirpath: str, silent_discard: bool = True) -> bool:
-    """Return True if the folder exists Else returns False and raises Not Found Error Message.
+    """Checks if directory exists.
 
     Args:
-        dirpath: Folder Path.
+        dirpath: Directory Path.
 
     Raises:
-        OSError: Raises OSError exception if folder not found.
+        DirectoryNotFoundError (Exception): Raises exception if directory not found.
 
     Returns:
-        bool: True, if folder is found Or False, if folder is not found.
+        bool: True, if directory is found Or False, if directory is not found.
     """
 
     try:
         if os.path.isdir(dirpath):
             return True
         else:
-            raise OSError
+            raise Exception
     except:
         if not silent_discard:
-            print("%s No such directory exists" % dirpath)
+            err_msg = f"No such directory exists: {dirpath}"
+            raise DirectoryNotFoundError(err_msg, log_stack=True) from None
         return False
 
 
@@ -885,7 +893,9 @@ def replace_string(File, search_string: str, replace_string: str) -> None:
             fd.write(filedata)
             fd.truncate()
     else:
-        raise Exception(f"Error: {File} file not found")
+        err_msg = f"No such file exists: {File}"
+        log.error(err_msg)
+        raise FileNotFoundError(err_msg)
 
 
 # Function to replace line if match string found.
@@ -898,7 +908,9 @@ def replace_line(File: str, search_string: str, add_line: str) -> None:
                     line = add_line
                 sys.stdout.write(line)
     else:
-        raise Exception(f"Error: {File} file not found")
+        err_msg = f"No such file exists: {File}"
+        log.error(err_msg)
+        raise FileNotFoundError(err_msg)
 
 
 def git_clone(
@@ -939,7 +951,7 @@ def git_clone(
         return True
     except Exception:
         print(f"Error: Failed to clone {repo_url}")
-        raise Exception(f"Error: Failed to clone {repo_url}")
+        raise GitError(f"Failed to clone {repo_url}")
 
 
 def has_key(dict_name, key) -> bool:
@@ -1087,7 +1099,9 @@ def symlink(src_file: str, dst_file: str) -> None:
     else:
         remove(src_file)
     if not is_file(dst_file) or is_dir(dst_file):
-        raise Exception(f"Error: {dst_file} file or directory not found to symlink")
+        err_msg = f"{dst_file} file or directory not found to symlink"
+        log.error(err_msg)
+        raise Exception(err_msg)
     os.symlink(dst_file, src_file)
 
 
@@ -1386,7 +1400,7 @@ def colorstr_to_plainstr(string):
     return format_string
 
 
-def rsync(console, src, dest, exclude_list=[".git*"]):
+def rsync(console, src, dest, exclude_list=[".git*"], timeout=200):
     cmd = f"rsync -aqv {src} {dest}"
 
     if len(exclude_list) > 1:
@@ -1395,7 +1409,33 @@ def rsync(console, src, dest, exclude_list=[".git*"]):
     elif len(exclude_list) == 1:
         exclude = "".join(exclude_list)
         cmd += f"  --exclude={exclude}"
-    console.runcmd(cmd)
+    console.runcmd(cmd, timeout=timeout)
+
+
+def str2bool(value: str) -> bool:
+    """Convert string case insensitive True/False to boolean"""
+    value = value.lower()
+    if value == "true":
+        return True
+    if value == "false":
+        return False
+
+
+def frange(start, stop=None, step=None):
+    """Generate stop inclusive range with decimal step"""
+    if stop is None:
+        stop = start
+        start = 0
+    if step is None:
+        step = 1
+    i = start
+    while True:
+        if step > 0 and i > stop:
+            break
+        elif step < 0 and i < stop:
+            break
+        yield i
+        i = round(i + step, 14)  # fix for floating point rounding error
 
 
 class FileAdapter:
@@ -1412,7 +1452,7 @@ class FileAdapter:
         for line in lines:
             self._data = self._data.replace(line, "")
             line = self.ansi_escape.sub("", line)
-            self.logger.debug(line.strip())
+            self.logger.debug(line.rstrip())
 
     def flush(self):
         pass  # leave it to logging to flush properly

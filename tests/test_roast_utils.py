@@ -3,7 +3,9 @@
 # SPDX-License-Identifier: MIT
 #
 
+from roast.utils import *  # pylint: disable=unused-wildcard-import
 from roast.utils.roast_utils import overrides as overrides_func
+import pytest
 from box import Box
 
 
@@ -35,3 +37,44 @@ def test_generate_conf_override_list_func(request):
     assert config["a.b"] == "ZCU102.A.B"
     assert config["b.a"] == "ZYNQ.A.A"
     assert config["b.b"] == "ZYNQ.A.B"
+
+
+def test_is_dir_exception():
+    with pytest.raises(
+        DirectoryNotFoundError, match="No such directory exists: /some/random/dir"
+    ):
+        is_dir("/some/random/dir", silent_discard=False)
+
+
+def test_is_file_exception():
+    with pytest.raises(
+        FileNotFoundError, match="No such file exists: /some/random/file.txt"
+    ):
+        is_file("/some/random/file.txt", silent_discard=False)
+
+
+def test_replace_string_exception():
+    with pytest.raises(
+        FileNotFoundError, match="No such file exists: /some/random/file.txt"
+    ):
+        replace_string("/some/random/file.txt", "something", "something else")
+
+
+def test_replace_line_exception():
+    with pytest.raises(
+        FileNotFoundError, match="No such file exists: /some/random/file.txt"
+    ):
+        replace_line("/some/random/file.txt", "something", "something else")
+
+
+def test_git_clone_exception():
+    with pytest.raises(GitError, match="Failed to clone myurl"):
+        git_clone("myurl", "/some/path", "master")
+
+
+def test_symlink_exception():
+    with pytest.raises(
+        Exception,
+        match="/some/other_random/file.txt file or directory not found to symlink",
+    ):
+        symlink("/some/random/file.txt", "/some/other_random/file.txt")

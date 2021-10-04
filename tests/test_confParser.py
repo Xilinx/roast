@@ -148,5 +148,5 @@ def test_generate_conf_full(request, mocker):
 
 
 def test_get_machine_file_exception(request):
-    with pytest.raises(Exception, match="zinc"):
+    with pytest.raises(FileNotFoundError, match="zinc"):
         get_machine_file("zinc")

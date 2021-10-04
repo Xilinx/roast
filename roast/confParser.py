@@ -48,7 +48,9 @@ def get_machine_file(machine: str) -> str:
             m = import_module(module)
             machine_file = inspect.getsourcefile(m)
         except ImportError:
-            raise Exception(f"ERROR: '{machine}' is not a valid machine")
+            err_msg = f"{machine} is not a valid machine"
+            log.exception(err_msg)
+            raise FileNotFoundError(err_msg)
     return machine_file
 
 
@@ -91,7 +93,8 @@ def generate_conf(
     relpath = os.path.relpath(test_path, rootdir)
     relpath_list = relpath.split(os.sep)
     del relpath_list[-1]  # remove file name from list
-    relpath_list.append(test_name)
+    if test_name:
+        relpath_list.append(test_name)
     relpath_param_list = relpath_list + params
 
     # Build list of configuration files by iterating each dir level
@@ -145,11 +148,14 @@ def generate_conf(
     log_dir = os.path.join(ws_dir, "log")
     work_dir = os.path.join(ws_dir, "work")
     images_dir = os.path.join(ws_dir, "images")
+    testSuite = (
+        relpath_list[0] if test_name else os.path.basename(os.path.normpath(rootdir))
+    )
 
     base_config = {
         "ROOT": rootdir,
         "buildDir": build_dir,
-        "testSuite": relpath_list[0],
+        "testSuite": testSuite,
         "test": test_name,
         "test_path_list": relpath_list,
         "test_param_path_list": relpath_param_list,
@@ -213,6 +219,9 @@ def generate_conf(
         if key in config:
             if type(config.as_dict()[key]) is list:
                 value = value.split(",")
+        if isinstance(value, str):
+            if value.lower() in ["false", "true"]:
+                value = str2bool(value)
         log.debug(f"Override variable applied: {key}: {value}")
         config.update({key: value})
 

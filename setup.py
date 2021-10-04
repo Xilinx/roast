@@ -71,6 +71,7 @@ setup(
         "mimesis",
         "filelock",
         "python-box",
+        "plusminus",
     ],
     extras_require={
         "dev": [

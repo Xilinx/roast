@@ -1,0 +1,74 @@
+{
+    "ip": {
+        "attribute1": {
+            "default": 64,
+            "values": [32, 64, 128, 256, 512],
+            "excluded" : [64, 128]
+        },
+        "attribute2": {
+            "default": 127,
+            "range": [0, 255],
+            "excluded" : [35, 36, 37]
+        },
+        "attribute3": {
+            "default": 9,
+            "range": [0, 127]
+        },
+        "attribute4": {
+            "default": 127
+        },
+        "attribute5": {
+            "default": 2,
+            "range": [0, 10, 2],
+            "excluded" : [4, 6]
+        },
+        "attribute6": {
+            "default": 14,
+            "range": [20]
+        },
+        "attribute7": {
+            "default": 1.4,
+            "range": [0, 2, 0.2]
+        },
+        "attribute8": {
+            "default": -1.4,
+            "range": [0, -2, -0.2]
+        },
+        "attribute9": {
+            "default": -1.6,
+            "range": [-2, -1, 0.2]
+        },
+        "delay_500": {
+            "default": 52,
+            "range": [20, 100]
+        },
+        "delay_501": {
+            "default": 52,
+            "range": [20, 100]
+        },
+        "delay_502": {
+            "default": 52,
+            "range": [20, 100]
+        },
+        "delay_503": {
+            "default": 52,
+            "range": [20, 100]
+        },
+        "ramp_500": {
+            "default": 2,
+            "range": [1, 30]
+        },
+        "ramp_501": {
+            "default": 2,
+            "range": [1, 30]
+        },
+        "ramp_502": {
+            "default": 2,
+            "range": [1, 30]
+        },
+        "ramp_503": {
+            "default": 2,
+            "range": [1, 30]
+        }
+    }
+}

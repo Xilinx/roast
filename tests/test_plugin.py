@@ -15,6 +15,7 @@ from stevedore import ExtensionManager
 from roast.utils import register_plugin
 from roast.serial import SerialBase
 from roast.component.board.board import BoardBase
+from roast.exceptions import PluginError
 
 
 class DummySerial(SerialBase):
@@ -71,6 +72,13 @@ def test_register_plugin():
     assert name in board_entries
 
 
-def test_register_plugin_exception():
-    with pytest.raises(Exception, match="not supported"):
-        register_plugin("", "", "")
+def test_register_plugin_type_exception():
+    with pytest.raises(ValueError, match="Plugin type 'unknown' is not supported"):
+        register_plugin("", "unknown", "")
+
+
+def test_register_plugin_namespace_exception():
+    with pytest.raises(
+        PluginError, match="Unable to load plugin my_serial, serial, mynamespace"
+    ):
+        register_plugin("my_serial", "serial", "mynamespace")
