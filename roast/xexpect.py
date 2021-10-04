@@ -16,6 +16,7 @@ import pexpect
 from typing import Optional, Union, List
 from roast.ssh import ssh_login_user, ssh_login
 from roast.utils import convert_list, colorstr_to_plainstr
+from roast.exceptions import ExpectError
 
 
 class Xexpect:
@@ -117,7 +118,6 @@ class Xexpect:
         """
 
         def _runcmd():
-            self.log.debug(f"cmd: {cmd}")
             self.sendline(cmd)
             index = self.expect(
                 expected_failures,
@@ -263,10 +263,9 @@ class Xexpect:
                         f"Timed out at {timeout}s, while  expecting: {expected}"
                     )
                 if err_msg:
-                    self.log.error(err_msg)
-                    raise Exception(err_msg)
+                    raise ExpectError(err_msg)
                 else:
-                    raise Exception(msgs[index])
+                    raise ExpectError(msgs[index])
             return index - err_index
 
         # If expected is not the prompt, there is still info in buffer.
@@ -279,9 +278,7 @@ class Xexpect:
         expected_list = convert_list(expected_failures, expected)
         # raises exception when nothing is expected
         if len(expected_list) == 0:
-            err_msg = "ERROR: Expected list is empty"
-            self.log.error(err_msg)
-            assert False, err_msg
+            raise ExpectError("Expected list is empty")
 
         index = _expect(cons, expected_list, err_index, timeout)
         # Expect again if expected strings are not self.prompt

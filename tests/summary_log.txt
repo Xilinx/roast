@@ -1,0 +1,20 @@
+INFO: this is an info test
+DEBUG: this is a debug test
+WARNING: this is a warning test
+ERROR: this is an error
+ERROR: this is an error
+ERROR: this is another error
+CRITICAL: this is critical
+INFO: this is failed
+WARNING Summary
+   1 WARNING: this is a warning test
+ERROR Summary
+   2 ERROR: this is an error
+   1 ERROR: this is another error
+CRITICAL Summary
+   1 CRITICAL: this is critical
+failed Summary
+   1 INFO: this is failed
+is.*error Summary
+   2 ERROR: this is an error
+   1 ERROR: this is another error

@@ -47,16 +47,15 @@ def scp_file_transfer(
         timeout: Time for expected output. Defaults to 3000.
 
     Raises:
-        Exception: When files fail to be transferred in within the timeout window.
+        ConnectionError: When files fail to be transferred in within the timeout window.
     """
     if not images:
         images = f"{self.config['images']}/*"
 
-    scp_base_cmd = (
-        f"""scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r """
-    )
-    proxy_flag = f'-o "ProxyCommand ssh {proxy_server} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p" '
-    cmd = f"{scp_base_cmd} {proxy_flag} "
+    cmd = "scp -r -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
+    if proxy_server:
+        proxy_cmd = f'-o "ProxyCommand ssh {proxy_server} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p" '
+        cmd += proxy_cmd
 
     # Send the file
     if transfer_to_target:
@@ -69,7 +68,7 @@ def scp_file_transfer(
             host_path = f"{self.config['host_path']}"
         cmd += f"{user}@{target_ip}:{images} {host_path}"
 
-    err = f"Error: Failed to scp {images} to {target_path}"
+    err = f"Failed to scp {images} to {target_path}"
     expected_failures = [
         "lost connection",
         "Name or service not known",
@@ -97,12 +96,12 @@ def scp_file_transfer(
             return_code = self._exit_non_zero_return(cmd, custom_err="Failed to scp")
             if return_code != 0:
                 if n >= 3:
-                    raise Exception(err)
+                    raise ConnectionError(err)
             else:
                 log.info(f"scp {images} to {target_path} successfully")
                 break
         else:
-            raise Exception(err)
+            raise ConnectionError(err)
 
 
 def pxssh_login(self, userid: str, password: str) -> None:
@@ -111,19 +110,18 @@ def pxssh_login(self, userid: str, password: str) -> None:
             terminal = pxssh.pxssh()
             terminal.login(self.ip, userid, password)
             terminal.logfile = FileAdapter(log)
-            log.info(f"Successfully established ssh connection with {self.ip}!")
+            log.info(f"Successfully established ssh connection with {self.ip}")
             self.terminal = terminal
             break
         except pxssh.ExceptionPxssh as e:
             log.info("ssh retry %s of %s \n %s" % (str(n), str(5), str(e)))
         time.sleep(1)
     if n >= 4:
-        log.error("error: Failed to establish ssh connection with %s!" % self.ip)
-        # FIXME: Raise exception
-        sys.exit(1)
+        err = f"Failed to establish ssh connection with {self.ip}"
+        log.error(err)
+        raise ConnectionError(err)
 
 
-# FIXME: Make it generic
 def ssh_login_user(self, userid: str, password: str) -> None:
     sshcmd = f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {userid}@{self.ip} -y"
     terminal = pexpect.spawn(
@@ -146,24 +144,23 @@ def ssh_login_user(self, userid: str, password: str) -> None:
             if index == 4:
                 break
             elif index == 3:
-                raise Exception(f"Error: {sshcmd} with incorrect password:{password}")
+                raise ConnectionError(f"{sshcmd} with incorrect password: {password}")
             elif index == 2:
                 self.terminal.sendline(password)
             elif index == 1:
-                raise Exception(f"Error: TIMEOUT wait for password while {sshcmd}")
+                raise ConnectionError(f"TIMEOUT wait for password while {sshcmd}")
             else:
-                raise Exception(
-                    f"Error: EOF while spawn {sshcmd} with password:{password}"
+                raise ConnectionError(
+                    f"EOF while spawn {sshcmd} with password: {password}"
                 )
-        except Exception as e:
+        except ConnectionError as e:
             log.error(e)
         time.sleep(1)
 
     if n >= 3:
-        log.error(
-            f"Error: Failed to establish ssh connection on {self.ip} with username:{userid} password:{password}"
-        )
-        sys.exit(1)
+        err = f"Failed to establish ssh connection with {self.ip}, username:{userid} password:{password}"
+        log.error(err)
+        raise ConnectionError(err)
     self.terminal.sendline("/bin/bash --norc")
     self.terminal.expect("bash-", timeout=60)
 
@@ -198,4 +195,4 @@ def ssh_login(self) -> None:
         if index == 3:
             err = "Password less login not Enabled"
             log.error(err)
-        raise Exception(f"ERROR: Failed to ssh on {self.ip}")
+        raise ConnectionError(f"Failed to establish ssh connection with {self.ip}")
