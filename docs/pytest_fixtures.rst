@@ -1,5 +1,3 @@
-.. _pytest-fixtures:
-
 =============================
  Pytest Fixtures and Options
 =============================
@@ -77,6 +75,16 @@ need to be specified.
 To override using a machine file::
 
   $ pytest --machine zynq
+
+\-\-randomize option
+--------------------
+
+This option allows the user to set a global `randomize` configuration parameter to `True` or
+`False`. If not specified, this is set to `False` by default.
+
+To enable randomization::
+
+  $ pytest --randomize
 
 Board Acquisition
 =================
