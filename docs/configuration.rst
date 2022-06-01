@@ -1,5 +1,3 @@
-.. _configuration-system:
-
 ==============================
  Layered Configuration System
 ==============================
@@ -23,7 +21,7 @@ Configuration files must be named **conf** and can be written in a number of for
 
 .. seealso::
 
-   :ref:`getting-started` tutorial for examples of project structures.
+   :doc:`/intro/getting_started` tutorial for examples of project structures.
 
 Single File
 ===========

@@ -22,6 +22,8 @@ class BoardBase(metaclass=ABCMeta):
         self.target_ip = None
         self.host = None
         self.first_boot = True
+        self.target_user = "root"
+        self.target_password = "root"
 
     @abstractmethod
     def start(self) -> None:
@@ -54,7 +56,7 @@ class BoardBase(metaclass=ABCMeta):
 
     def _get_target_ip(self) -> None:
         self.serial.sendline("ifconfig eth0")
-        self.serial.expect("# ")
+        self.serial.expect(expected=["# ", r"\$ "], timeout=10, wait_for_prompt=False)
         self.target_ip = self.serial.search("(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
 
 

@@ -7,6 +7,7 @@ from roast.utils import *  # pylint: disable=unused-wildcard-import
 from roast.utils.roast_utils import overrides as overrides_func
 import pytest
 from box import Box
+import os
 
 
 def test_generate_conf_override_func():
@@ -78,3 +79,19 @@ def test_symlink_exception():
         match="/some/other_random/file.txt file or directory not found to symlink",
     ):
         symlink("/some/random/file.txt", "/some/other_random/file.txt")
+
+
+def test_copy_data_exception(tmpdir):
+    # Sample src file for positive test
+    sample_file = os.path.realpath(__file__)
+    # Sample src dir for positive test
+    sample_dir = os.path.dirname(sample_file)
+    # Sample src path for testing exception
+    random_file = "/some/random/file.txt"
+    # Below two are positive test scenarios
+    copy_data(sample_file, tmpdir)
+    copy_data(sample_dir, tmpdir)
+    # Below two are negative test scenarios
+    copy_data(random_file, tmpdir)
+    with pytest.raises(ValueError):
+        copy_data(random_file, tmpdir, silent_discard=False)

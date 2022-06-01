@@ -1,5 +1,3 @@
-.. _component-plugins-models:
-
 =========================
  Component Plugin Models
 =========================
@@ -105,7 +103,7 @@ that inherits from the base class will need to implement these methods.
 
 .. seealso::
 
-   :ref:`component-plugins`
+   :doc:`component_plugins`
 
 .. _stevedore: https://github.com/openstack/stevedore
 .. _entry points: https://packaging.python.org/specifications/entry-points/

@@ -42,6 +42,7 @@ class Xexpect:
         self.non_interactive = non_interactive
         self.exit_nzero_ret = exit_nzero_ret  # if set, will assert on non zero returns
         self.echo = echo
+        self.timeout_multiplier = 1  # To increase default timeout
         atexit.register(self.exit)
         self._setup_ip_prompt(hostip, hostname)
         self._setup_ssh(userid, password)
@@ -247,6 +248,9 @@ class Xexpect:
             err_msg: Custom error message. Defaults to None.
 
         """
+
+        timeout *= self.timeout_multiplier
+        # Default timeout will increase by multiple times, value assigned to timeout_multiplication.
 
         def _expect(cons, expected, err_index, timeout):
             expected_list = convert_list(pexpect.EOF, pexpect.TIMEOUT, expected)

@@ -13,11 +13,12 @@ from roast.utils import is_dir, remove, copyDirectory
 log = logging.getLogger(__name__)
 
 
-def read_json(file_path):
+def read_json(file_path, decode_numbers=False):
     """function that returns the json dictionary object by reading a json file
 
     Args:
         file_path (str): path to json file
+        decode_numbers (bool): Flag to decode strings to numbers
 
     Returns:
         dict: retrun the JSON data
@@ -25,8 +26,10 @@ def read_json(file_path):
     try:
         with open(file_path) as db_file_handle:
             try:
-                data = json.load(db_file_handle)
-                return data
+                if decode_numbers:
+                    return json.load(db_file_handle, object_hook=_decode_numbers)
+                else:
+                    return json.load(db_file_handle)
             except ValueError:
                 log.error(f"Invalid JSON file {file_path}")
                 raise ValueError
@@ -49,11 +52,37 @@ def write_json(file_path, data, sort=True):
     try:
         with open(file_path, "w") as db_file_handle:
             json.dump(
-                data, db_file_handle, sort_keys=sort, separators=(",", ": "), indent=4
+                data,
+                db_file_handle,
+                sort_keys=sort,
+                separators=(",", ": "),
+                indent=4,
             )
     except IOError:
         log.error(f"Unable to write to : {file_path}")
         raise IOError
+
+
+def _decode_numbers(object):
+    if isinstance(object, str):
+        prefix = object[0:2]
+        try:
+            if prefix in ("0x", "0X"):
+                return int(object, 16)
+            elif prefix in ("0b", "0B"):
+                return int(object, 2)
+            elif prefix in ("0o", "0O"):
+                return int(object, 8)
+            else:
+                return float(object)
+        except ValueError:
+            return object
+    elif isinstance(object, dict):
+        return {k: _decode_numbers(v) for k, v in object.items()}
+    elif isinstance(object, list):
+        return [_decode_numbers(v) for v in object]
+    else:
+        return object
 
 
 def archive_artifacts(

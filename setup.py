@@ -81,7 +81,10 @@ setup(
             "pytest-freezegun",
             "miniver",
             "coverage",
-        ]
+        ],
+        "numpy": [
+            "numpy",
+        ],
     },
     cmdclass=cmdclass,
 )

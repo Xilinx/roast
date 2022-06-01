@@ -1,6 +1,9 @@
-======================================================
+=====================================================
  ROAST -- Randomized Okaying Across System Topologies
-======================================================
+=====================================================
+
+.. meta::
+   :description lang=en: An open-source Python framework that simplifies the development of complex validation test suites.
 
 ROAST is an open-source Python framework that simplifies the development of complex validation
 test suites. To accomplish this, ROAST provides a collection of interfaces that allows test
@@ -15,26 +18,85 @@ Key features:
 - Generic APIs for simplified usage and access
 - Plugin system for extensibility
 
-ROAST consists of three packages:
+To find out more, visit :doc:`/features`.
 
-- **roast**: Core functionality that includes interfaces, plugin framework, configuration
-  management, and more
-- **roast-xilinx (recommended)**: plugin for roast that includes Xilinx specific functionality such as
-  board acquisition, PetaLinux building, Vitis wrapper, and more.
-- **pytest-roast (optional)**: plugin for pytest that includes pytest fixtures for accelerated test
-  development when using pytest as a test runner. Features includes board automation, scenario
-  generation, and configuration generation.
+First steps
+-----------
 
-Example test flow with package breakdown:
+New to test development? Learn how to establish a Python environment and a test repository
+for your testing requirements.
 
-.. image:: images/roast_packages.png
+* **Installation**: :doc:`/intro/install`
 
-Contents
-========
+* **Getting started**: :ref:`intro/getting_started:environment setup` | :ref:`intro/getting_started:repository structure`
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Getting Started
+
+   intro/install
+   intro/getting_started
+   features
+
+ROAST feature overview
+----------------------
+
+* **Scaling test suites through configuration**:
+  :doc:`configuration` |
+  :doc:`complex_structures`
+
+* **Test execution with pytest**:
+  :doc:`pytest_fixtures`
+
+* **Randomization**:
+  :doc:`provider`
 
 .. toctree::
    :maxdepth: 3
+   :hidden:
+   :caption: Feature Overview
 
-   install/index
-   tutorial/index
-   advanced/index
+   configuration
+   complex_structures
+   pytest_fixtures
+   provider
+
+ROAST examples
+--------------
+
+* **Complete examples**:
+  :doc:`examples_repository`
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Example
+
+   examples_repository
+
+Advanced features of ROAST
+--------------------------
+
+* **Developer Interface**:
+  :doc:`reference/index`
+
+* **Building plugins**:
+  :doc:`advanced/component_models` |
+  :doc:`advanced/component_plugins`
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Advanced features
+
+   reference/index
+   advanced/component_models
+   advanced/component_plugins
+
+.. Indices and tables
+.. ==================
+
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`

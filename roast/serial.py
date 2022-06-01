@@ -23,7 +23,7 @@ class Serial:
         )
 
     @property
-    def driver(self) -> driver:
+    def driver(self):
         return self._serial_mgr.driver
 
     def exit(self) -> None:

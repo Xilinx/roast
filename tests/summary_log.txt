@@ -15,6 +15,11 @@ CRITICAL Summary
    1 CRITICAL: this is critical
 failed Summary
    1 INFO: this is failed
+INFO Summary
+   1 INFO: this is an info test
+   1 INFO: this is failed
+DEBUG Summary
+   1 DEBUG: this is a debug test
 is.*error Summary
    2 ERROR: this is an error
    1 ERROR: this is another error

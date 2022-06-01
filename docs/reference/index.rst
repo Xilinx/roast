@@ -3,7 +3,28 @@
 ===============
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
 
-   functions/index
-   objects/index
+   aie
+   basebuild
+   bif
+   board
+   boot
+   cmake
+   confparser
+   crosscompile
+   linux
+   logger
+   petalinux
+   plugin
+   randomizer
+   scenario
+   sd
+   serial
+   systembase
+   testsuitebase
+   util
+   xexpect
+   xsct
+   xsdb
+   yocto

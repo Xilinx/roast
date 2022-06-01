@@ -1,5 +1,3 @@
-.. _complex-repository-structures:
-
 ===============================
  Complex Repository Structures
 ===============================

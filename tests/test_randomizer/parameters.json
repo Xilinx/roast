@@ -2,7 +2,7 @@
     "ip": {
         "attribute1": {
             "default": 64,
-            "values": [32, 64, 128, 256, 512],
+            "elements": [32, 64, 128, 256, 512],
             "excluded" : [64, 128]
         },
         "attribute2": {
@@ -37,6 +37,44 @@
         "attribute9": {
             "default": -1.6,
             "range": [-2, -1, 0.2]
+        },
+        "attribute10": {
+            "default": 18,
+            "range": [10, 20],
+            "randomize": false
+        },
+        "attribute11": {
+            "range": [20, 30],
+            "replace": false
+        },
+        "attribute12": {
+            "default": "0X08",
+            "elements": ["0x02", "0o10", "0b10000"],
+            "format": "#010b"
+        },
+        "attribute13": {
+            "default": "0x0C",
+            "range": ["0X00", "0O20", "0B10"],
+            "format": "#04x"
+        },
+        "attribute14": {
+            "default": "1.000000e+03",
+            "range": ["8.000000e+02", "1.200000e+03", 50],
+            "format": "e"
+        },
+        "attribute15": {
+            "range": [1, 100],
+            "replace": false
+        },
+        "attribute16": {
+            "range": [1, 100],
+            "replace": false,
+            "preset": "LOW_HEAVY"
+        },
+        "attribute17": {
+            "range": [1, 100],
+            "replace": false,
+            "shape": [1, 10]
         },
         "delay_500": {
             "default": 52,
