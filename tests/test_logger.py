@@ -4,8 +4,8 @@
 #
 
 import os
-import logging
 import filecmp
+import logging
 import pytest
 from roast.utils import Logger, setup_logger, teardown_logger
 
@@ -75,8 +75,9 @@ def test_logger(tmpdir):
         console_level=logging.DEBUG,
         console_format="{levelname:<8} {message}",
         file_format="{levelname}: {message}",
+        search_tokens=["failed", "INFO", "DEBUG"],
+        error_tokens=["is.*error"],
         report_summary=True,
-        report_tokens=["failed", "is.*error"],
     )
     log.info("this is an info test")
     log.debug("this is a debug test")

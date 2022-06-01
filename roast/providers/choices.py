@@ -32,9 +32,9 @@ class Choices(BaseProvider):
         self,
         items: Optional[Sequence[Any]],
         weights: Optional[Sequence[float]] = None,
-        length: int = 0,
+        length: int = 1,
         unique: bool = False,
-    ) -> Sequence[Any]:
+    ) -> Union[Sequence[Any], Any]:
         """Generate a randomly-chosen sequence from a sequence.
 
         Provide elements randomly chosen from the elements in a sequence
@@ -45,7 +45,7 @@ class Choices(BaseProvider):
         only unique elements.
 
         :param items: Non-empty sequence (list, tuple or string) of elements.
-        :param weights: Non-empty sequence (list, tuple or string) of floats.
+        :param weights: Non-empty sequence (list or tuple) of floats.
         :param length: Length of sequence (number of elements) to provide.
         :param unique: If True, ensures provided elements are unique.
         :return: Sequence or uncontained element randomly chosen from items.
@@ -79,9 +79,6 @@ class Choices(BaseProvider):
         if length < 0:
             raise ValueError("**length** should be a positive integer.")
 
-        if length == 0:
-            return self.random.choices(items, weights, k=1)
-
         data: List[str] = []
         if unique and len(set(items)) < length:  # avoid an infinite while loop
             raise ValueError(
@@ -91,7 +88,7 @@ class Choices(BaseProvider):
         if unique:
             while len(data) < length:
                 (item,) = self.random.choices(items, weights, k=1)
-                if (unique and item not in data) or not unique:
+                if unique and item not in data:
                     data.append(item)
         else:
             data = self.random.choices(items, weights, k=length)

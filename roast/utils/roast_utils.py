@@ -731,6 +731,24 @@ def copyDirectory(src: str, dst: str, symlinks: bool = False, ignore=None) -> No
             shutil.copy2(s, d)
 
 
+def copy_data(
+    src: str, dst: str, symlinks: bool = False, ignore=None, silent_discard: bool = True
+) -> None:
+    """This api finds if the source is a file or a directory, and copies it accordingly
+    to the destination directory"""
+    if is_file(src):
+        copy_file(src, dst, follow_symlinks=symlinks)
+    elif is_dir(src):
+        copyDirectory(src, dst, symlinks, ignore)
+    else:
+        err_msg = f"The path: {src} doesn't exist"
+        if not silent_discard:
+            log.exception(err_msg)
+            raise ValueError(err_msg)
+        else:
+            log.info(err_msg)
+
+
 # Read file matching regex lines only
 def read_file(file_path, regex):
     valid_lines = []
@@ -1459,3 +1477,27 @@ class FileAdapter:
 
     def exit(self):
         self.logger.debug(self._data)
+
+
+def to_nested(dictionary: dict) -> dict:
+    """Converts dictionary with dotted keys into nested dictionary
+
+    Args:
+        dictionary (dict): Dot keyed dictionary such as Box
+
+    Returns:
+        dict: Nested dictionary
+    """
+    result = {}
+
+    def split_rec(k, v, out):
+        # split on "." and call recursively to generate nested dictionaries
+        k, *rest = k.split(".", 1)
+        if rest:
+            split_rec(rest[0], v, out.setdefault(k, {}))
+        else:
+            out[k] = v
+
+    for k, v in dictionary.items():
+        split_rec(k, v, result)
+    return result

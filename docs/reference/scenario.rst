@@ -1,7 +1,8 @@
-.. _scenario-class:
+Scenario
+========
 
 Scenario class
-==============
+--------------
 
 A ``Scenario`` class in **component/_init_.py** is provided within ROAST which will create and
 save references to component plugins. This class has high level methods to dispatch method
@@ -20,3 +21,9 @@ include:
 * :func:`ts()` - returns the object of the TestSuite component
 * :func:`sys()` - returns the object of the System component specified by component name (because
   there can be more than one system component)
+
+Scenario function
+-----------------
+
+A ``scenario`` function in **component/_init_.py** is provided to instantiate ``Scenario``,
+automatically load the components, and return the instance.

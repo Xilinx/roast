@@ -1,11 +1,9 @@
-.. _component-plugins:
-
 ===================
  Component Plugins
 ===================
 
 In this tutorial, we will discuss how to create and load component plugins. If you're not familiar
-with the component models, please first visit :ref:`component-plugins-models` for details.
+with the component models, please first visit :doc:`component_models` for details.
 
 Creating Plugins
 ================

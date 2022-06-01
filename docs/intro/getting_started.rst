@@ -1,5 +1,3 @@
-.. _getting-started:
-
 =================
  Getting Started
 =================
@@ -14,14 +12,14 @@ Environment Setup
 =================
 
 While ROAST is test runner agnostic, this tutorial will use `pytest`_ and
-:ref:`pytest fixtures<pytest-fixtures>` developed specifically for ROAST. This means both ``roast``
+:doc:`pytest fixtures</pytest_fixtures>` developed specifically for ROAST. This means both ``roast``
 and ``pytest-roast`` packages must be installed. While optional, it is highly recommended that
 these are installed into a `virtual environment`_.
 
 Upon installation of ``pytest-roast``, ``pytest`` will automatically be installed as a dependency.
 
 .. note::
-   Please review :ref:`installation` instructions on how to install Python packages using pip.
+   Please review :doc:`install` instructions on how to install Python packages using pip.
 
 Repository Structure
 ====================
@@ -49,16 +47,16 @@ test_basic.py
 
     def test_basic(create_configuration):
         conf = create_configuration()
-        assert conf.var == "hello world"
+        assert conf["var"] == "hello world"
 
 In **test_basic.py**, when ``pytest`` is imported, all pytest fixtures will be available. Since
 ``pytest-roast`` is installed as a pytest plugin, the ``create_configuration`` fixture is
 also available and can be added as an argument to the test. When called, the configuration is read
 from **conf.py** and assigned to the ``conf`` variable. The value of ``var`` is then accessed by
-accessing ``conf.var``.
+accessing ``conf["var"]``.
 
 .. note::
-   For other methods of accessing configuration values, visit :ref:`configuration-system`.
+   For other methods of accessing configuration values, visit :doc:`/configuration`.
 
 First, let's see what pytest collects as tests::
 
@@ -83,7 +81,7 @@ We can now execute the test::
     ======= 1 passed in 0.18s ========
 
 .. note::
-   Visit :ref:`complex-repository-structures` for advanced parameterized and categorized testing
+   Visit :doc:`/complex_structures` for advanced parameterized and categorized testing
    scenarios.
 
 .. _pytest: https://pytest.org/
