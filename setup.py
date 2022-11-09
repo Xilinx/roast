@@ -72,6 +72,8 @@ setup(
         "filelock",
         "python-box",
         "plusminus",
+        "numpy",
+        "importlib-metadata<5.0.0",
     ],
     extras_require={
         "dev": [
@@ -81,9 +83,6 @@ setup(
             "pytest-freezegun",
             "miniver",
             "coverage",
-        ],
-        "numpy": [
-            "numpy",
         ],
     },
     cmdclass=cmdclass,

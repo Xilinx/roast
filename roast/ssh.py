@@ -79,10 +79,14 @@ def scp_file_transfer(
         "Network is unreachable",
         "No space left on device",
     ]
-    expected = ["[Pp]assword", self.hostname]
+    expected = ["[Pp]assword", "Do you want to continue", self.hostname]
+
+    if self.prompt:
+        expected.append(self.prompt)
+
     self.sync()
     self.sendline(str(cmd))
-    for n in range(4):
+    for n in range(5):
         index = self.expect(
             expected_failures,
             expected,
@@ -93,9 +97,12 @@ def scp_file_transfer(
         if index == 0:
             self.sendline(password)
         elif index == 1:
+            self.sendline("y")
+        elif index in (2, 3):
             return_code = self._exit_non_zero_return(cmd, custom_err="Failed to scp")
             if return_code != 0:
-                if n >= 3:
+                # Max re-tries exceeded
+                if n >= 4:
                     raise ConnectionError(err)
             else:
                 log.info(f"scp {images} to {target_path} successfully")
