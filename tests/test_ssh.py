@@ -129,6 +129,7 @@ def test_pxssh_login_exception(c, mocker):
 def test_scp_file_transfer(c, mocker):
     c.sync = mocker.Mock("sync")
     c.sendline = mocker.Mock("sendline")
+    c.prompt = mocker.Mock("prompt")
     c.expect = mocker.Mock("expect", return_value=0)
     c.config = {"images": "my_images", "target_path": "my_target_path"}
     call_password = mocker.call("root")
@@ -146,6 +147,7 @@ def test_scp_file_transfer(c, mocker):
 def test_scp_file_transfer_proxy(c, mocker):
     c.sync = mocker.Mock("sync")
     c.sendline = mocker.Mock("sendline")
+    c.prompt = mocker.Mock("prompt")
     c.expect = mocker.Mock("expect", return_value=0)
     c.config = {"images": "my_images", "target_path": "my_target_path"}
     call_password = mocker.call("root")
@@ -163,6 +165,7 @@ def test_scp_file_transfer_proxy(c, mocker):
 def test_scp_file_transfer_zero_return(c, mocker):
     c.sync = mocker.Mock("sync")
     c.sendline = mocker.Mock("sendline")
+    c.prompt = mocker.Mock("prompt")
     c.config = {"images": "my_images", "target_path": "my_target_path"}
     call_scp = mocker.call(
         "scp -r -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null my_images/* root@:my_target_path"
@@ -178,6 +181,7 @@ def test_scp_file_transfer_zero_return(c, mocker):
 def test_scp_file_transfer_from_target(c, mocker):
     c.sync = mocker.Mock("sync")
     c.sendline = mocker.Mock("sendline")
+    c.prompt = mocker.Mock("prompt")
     c.expect = mocker.Mock("expect", return_value=0)
     c.config = {"images": "my_images", "host_path": "my_host_path"}
     call_password = mocker.call("root")
@@ -195,15 +199,16 @@ def test_scp_file_transfer_from_target(c, mocker):
 def test_scp_file_transfer_exception(c, mocker):
     c.sync = mocker.Mock("sync")
     c.sendline = mocker.Mock("sendline")
+    c.prompt = mocker.Mock("prompt")
     c.config = {"images": "my_images", "target_path": "my_target_path"}
 
-    # index=1, exit_non_zero_return=1
-    c.expect = mocker.Mock("expect", return_value=1)
+    # index=2, exit_non_zero_return=1
+    c.expect = mocker.Mock("expect", return_value=2)
     c._exit_non_zero_return = mocker.Mock("return_code", return_value=1)
     with pytest.raises(ConnectionError, match="Failed to scp"):
         scp_file_transfer(c, timeout=10)
 
-    # index=2
-    c.expect = mocker.Mock("expect", return_value=2)
+    # index=3
+    c.expect = mocker.Mock("expect", return_value=3)
     with pytest.raises(ConnectionError, match="Failed to scp"):
         scp_file_transfer(c, timeout=10)

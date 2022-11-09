@@ -22,7 +22,7 @@ copyright = "2020-2021, Xilinx"
 author = "Xilinx"
 
 # The full version, including alpha/beta/rc tags
-release = "4.0"
+release = "5.0"
 
 
 # -- General configuration ---------------------------------------------------
